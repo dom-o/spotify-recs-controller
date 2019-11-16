@@ -1,0 +1,59 @@
+<template lang="html">
+<ul class="wrapper--row">
+  <li v-for="genre in genres">
+    <Genre
+      :genre="genre"
+      :seed_count="seed_count"
+      :seed_genres="seed_genres"
+      @toggle="toggleGenre($event.toggle, $event.seed)"
+    />
+  </li>
+</ul>
+</template>
+
+<style lang="css" scoped>
+.wrapper--row {
+  justify-content: center;
+}
+</style>
+
+<script>
+import { mapState, mapGetters } from 'vuex'
+import axios from 'axios'
+import Genre from './Genre.vue'
+
+export default {
+  name: 'GenreSearch',
+  components: {
+    Genre,
+  },
+  computed: {
+    ...mapState({
+      seed_genres: state => state.seed_genres,
+    }),
+    ...mapGetters(['seed_count'])
+  },
+  created() {
+    this.getGenres()
+  },
+  methods: {
+    toggleGenre: function(checked, genre) {
+      checked ? this.$store.commit('addGenre', genre) : this.$store.commit('removeGenre',genre)
+    },
+    getGenres: function() {
+      axios.get('http://localhost:3000/genres')
+      .then(response => {
+        this.genres = response.data.genres
+      })
+      .catch(error => {
+        console.log(error)
+      })
+    },
+  },
+  data() {
+    return {
+      genres: [],
+    }
+  }
+}
+</script>
