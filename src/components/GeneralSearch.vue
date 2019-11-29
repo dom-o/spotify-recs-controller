@@ -4,7 +4,13 @@
     <input v-model="query" type="text" class="search__input">
     <input type="submit" value="search" class="search__button--submit">
   </form>
-  <ul class="wrapper--col">
+  <p v-if="no_results">
+    There are no results for "{{display_query}}". Try searching something else?
+  </p>
+  <ul
+    v-else
+    class="wrapper--col"
+  >
     <li v-for="artist in this.artist_results"
       :key="artist.id"
     >
@@ -82,6 +88,8 @@ export default {
         this.$store.commit('updateSongResults', response.data.tracks.items)
         this.$store.commit('updateArtistResults', response.data.artists.items)
         console.log(response)
+        this.no_results = !response.data.tracks.items.length || !response.data.artists.items.length
+        this.display_query = this.query
       })
       .catch(error => {
         console.log(error)
@@ -99,6 +107,8 @@ export default {
   data() {
     return {
       query: "",
+      display_query: "",
+      no_results: false,
     }
   },
 }
