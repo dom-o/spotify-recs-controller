@@ -1,9 +1,9 @@
 <template lang="html">
-    <input
-      type="checkbox"
-      :checked="checked"
-      @change="$emit('toggle', $event.target.checked)"
-    >
+  <input
+    type="checkbox"
+    :checked="checked"
+    @change="$emit('toggle', $event.target.checked)"
+  >
 </template>
 
 <script>

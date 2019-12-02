@@ -22,9 +22,7 @@
   justify-content:center;
   overflow:hidden;
   background-color: lightgrey;
-  margin-right: 1rem;
-  margin-top:0.25rem;
-  margin-bottom:0.25rem;
+  margin: 0.25rem 1rem 0.25rem 0.5rem;
   border-radius:5px;
 }
 .thumbnail__image {

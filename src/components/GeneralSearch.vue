@@ -7,13 +7,8 @@
   <p v-if="no_results">
     There are no results for "{{display_query}}". Try searching something else?
   </p>
-  <ul
-    v-else
-    class="wrapper--col"
-  >
-    <li v-for="artist in this.artist_results"
-      :key="artist.id"
-    >
+  <ul v-else class="wrapper--col">
+    <li v-for="artist in this.artist_results" :key="artist.id">
       <Artist
         :artist="artist"
         :seed_count="seed_count"
@@ -21,9 +16,7 @@
         @toggle="toggleSeed($event.seed, $event.type, $event.toggle)"
       />
     </li>
-    <li v-for="song in this.song_results"
-      :key="song.id"
-    >
+    <li v-for="song in this.song_results" :key="song.id">
       <Song
         :song="song"
         :seed_count="seed_count"

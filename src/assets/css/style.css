@@ -1,37 +1,37 @@
-html{
-  box-sizing: border-box;
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-align: left;
+  margin-top: 1rem;
 }
-*,
-*:before,
-*:after {
-  box-sizing: inherit;
-}
-ul, ol, dd{margin:0; padding:0; list-style:none;}
-figure{margin:0;}
 body{
 	margin:1em auto;
 	max-width:45em;
 	padding:0 .62em;
 	font:1em/1.62 sans-serif;
 }
-h1,h2,h3 {
-	line-height:1.2;
-}
 @media print{
-	body{
-		max-width:none
-	}
+	body { max-width:none }
 }
-.nav__link--forward {
-  float: right;
+html{ box-sizing: border-box; }
+figure { margin:0; }
+h1,h2,h3 { line-height:1.2; }
+*, *:before, *:after {
+  box-sizing: inherit;
 }
-.nav__link--backward {
-  float: left;
+ul, ol, dd {
+  margin:0;
+  padding:0;
+  list-style:none;
 }
+
+.nav__link--forward { float: right; }
+.nav__link--backward { float: left; }
 .checkbox {
   display: inline-flex;
   align-items: center;
-  border: 1px solid #000;
+  border: 1px solid black;
   border-radius: 10px;
   padding: 0.1rem 0.25rem;
   margin: 0.25rem 0.25rem;
@@ -41,7 +41,7 @@ h1,h2,h3 {
   background-color: inherit;
 }
 .--checked {
-  background-color:yellow;
+  background-color:#FFDC00;
 }
 .wrapper--col {
   display: flex;
@@ -51,11 +51,20 @@ h1,h2,h3 {
   display: flex;
   flex-flow: row wrap;
 }
-#app {
-  font-family: 'Avenir', Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: left;
-  color: #2c3e50;
-  margin-top: 1rem;
+.seed__list{
+  display:flex;
+  flex-flow: row nowrap;
+  overflow-x:auto;
+}
+.seed__container {
+  max-width: 30%;
+  flex: 0 0 auto;
+  margin: 0rem 0.2rem;
+}
+.seed {
+  height: 3.25rem;
+  width: 100%;
+  overflow: hidden;
+  white-space: nowrap;
+  padding: 0.25rem 0.25rem;
 }

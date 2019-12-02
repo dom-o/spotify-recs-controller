@@ -77,7 +77,6 @@ app.get('/info', function(req, res) {
     res.json(converted)
   })
   .catch(error => {
-    //if(error.response.status===401) { get_access_token() }
     console.log(error.response)
     res.send({error})
   })

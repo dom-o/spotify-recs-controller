@@ -2,7 +2,7 @@
   <div style="clear: both;">
     <h1>Seeds ({{ seed_count }}/5)</h1>
     <ul v-if="seed_count >0" class="seed__list">
-      <li v-for="song in this.seed_songs"  :key="song.id" class="seed__container">
+      <li v-for="song in this.seed_songs" :key="song.id" class="seed__container">
         <div class="checkbox seed">
           <Thumbnail
             :image_source="song.album.images[0]
@@ -40,23 +40,6 @@
 <style lang="css" scoped>
 .genre {
   justify-content: center;
-}
-.seed__list{
-  display:flex;
-  flex-flow: row nowrap;
-  overflow-x:auto;
-}
-.seed__container {
-  width: 30%;
-  flex: 0 0 auto;
-  margin: 0rem 0.2rem;
-}
-.seed {
-  height: 3.25rem;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 0.25rem 0.25rem;
 }
 </style>
 

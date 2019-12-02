@@ -7,9 +7,7 @@
 <h1>New tracks</h1>
 <ul v-if="seed_count>0">
   <li v-for="track in this.track_results" :key="track.id">
-    <SongDisplay
-      :song="track"
-    />
+    <SongDisplay :song="track" />
   </li>
 </ul>
 <p v-else>This recommends you new music based on music you like already. <router-link to="/search">Pick some music you like first</router-link>.</p>
@@ -43,11 +41,7 @@ export default {
     ])
   },
   created() {
-    // if(this.seed_count > 0) {
-      this.getRecData()
-    // } else {
-    //   this.$router.push('search')
-    // }
+    this.getRecData()
   },
   methods: {
     getRecData: function() {
@@ -75,9 +69,7 @@ export default {
       }
 
       console.log(params)
-      axios.get('http://localhost:3000/rec', {
-        params: params
-      })
+      axios.get('http://localhost:3000/rec', { params: params })
       .then(response => {
         console.log(response)
         this.track_results = response.data.tracks

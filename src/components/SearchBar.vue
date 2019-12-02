@@ -13,7 +13,7 @@
       @toggle="toggleSeed($event.seed, $event.type, $event.toggle)"
     />
   </li>
-  <li v-for="artist in this.seed_artists"  :key="artist.id" class="seed__container">
+  <li v-for="artist in this.seed_artists" :key="artist.id" class="seed__container">
     <Artist class="seed"
       :artist="artist"
       :seed_count="seed_count"
@@ -39,23 +39,6 @@
 <style lang='css' scoped>
 .item--fullrow {
   flex: 0 1 100%;
-}
-.seed__list{
-  display:flex;
-  flex-flow: row nowrap;
-  overflow-x:auto;
-}
-.seed__container {
-  width: 30%;
-  flex: 0 0 auto;
-  margin: 0rem 0.2rem;
-}
-.seed {
-  height: 3.25rem;
-  width: 100%;
-  overflow: hidden;
-  white-space: nowrap;
-  padding: 0.25rem 0.25rem;
 }
 </style>
 

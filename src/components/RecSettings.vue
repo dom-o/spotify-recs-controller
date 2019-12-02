@@ -7,7 +7,7 @@
 <SeedList />
 <h1>Tracklist settings</h1>
 <p>
-  Here you can fine-tune the recommendations you'll get. If you set instrumentalness to less than 0.35, for example, you probably won't be recommended any instrumental tracks.
+  Here you can fine-tune the recommendations you'll get. If you set instrumentalness to less than 0.35, for example, you probably won't be recommended any instrumental tracks. You could also set valence high if you want more cheery tracks.
 </p>
 <form v-if="seed_count>0" @submit.prevent="processForm">
   <div v-for="feature in audio_features" class="wrapper--col">
@@ -88,18 +88,11 @@
   padding-top: 0rem;
 }
 table {
+  border-collapse: collapse;
+}
+th,td {
+  text-align: center;
   border: 1px solid black;
-}
-th {
-  border-bottom: 1px solid black;
-  text-align: center;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
-}
-td {
-  text-align: center;
-  border-left: 1px solid black;
-  border-right: 1px solid black;
 }
 </style>
 
@@ -134,11 +127,7 @@ export default {
     ]),
   },
   created() {
-    // if(this.seed_count > 0) {
-      this.getSeedData()
-    // } else {
-    //   this.$router.push('search')
-    // }
+    this.getSeedData()
   },
   methods: {
     processForm: function() { this.$router.push('results') },
@@ -166,8 +155,6 @@ export default {
       .then(response => {
         this.song_details = response.data.audio_features
         this.artist_details = response.data.artists
-
-
 
         console.log(this.seed_songs)
         console.log(this.song_details)
