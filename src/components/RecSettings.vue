@@ -69,7 +69,12 @@
       <tbody>
         <tr>
           <td v-for="song in seed_songs">
-            {{ getFeatureValue(song, feature, song_details) }}
+            <template v-if="song_details.length">
+              {{ getFeatureValue(song, feature, song_details) }}
+            </template>
+            <template v-else>
+              ..loading
+            </template>
           </td>
         </tr>
       </tbody>
@@ -100,9 +105,6 @@ th,td {
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
 import { mapState, mapGetters } from 'vuex'
-import SongDisplay from './SongDisplay.vue'
-import Artist from './Artist.vue'
-import Genre from './Genre.vue'
 import SeedList from './SeedList.vue'
 
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
@@ -110,15 +112,10 @@ axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 export default {
   name: 'RecSettings',
   components: {
-    SongDisplay,
-    Artist,
-    Genre,
     SeedList,
   },
   computed: {
     ...mapState({
-      seed_artists: state => state.seed_artists,
-      seed_genres: state => state.seed_genres,
       seed_songs: state => state.seed_songs,
       audio_features: state => state.audio_features,
     }),
@@ -127,7 +124,9 @@ export default {
     ]),
   },
   created() {
-    this.getSeedData()
+    if(this.seed_songs.length) {
+      this.getSeedData()
+    }
   },
   methods: {
     processForm: function() { this.$router.push('results') },
@@ -149,15 +148,10 @@ export default {
       axios.get('http://localhost:3000/info', {
         params: {
           tracks: this.seed_songs.map(seed => seed.id),
-          artists: this.seed_artists.map(seed => seed.id)
         }
       })
       .then(response => {
         this.song_details = response.data.audio_features
-        this.artist_details = response.data.artists
-
-        console.log(this.seed_songs)
-        console.log(this.song_details)
       })
       .catch(error => {
         console.log(error)
@@ -168,7 +162,6 @@ export default {
   data () {
     return {
       song_details: [],
-      artist_details: [],
     }
   }
 }

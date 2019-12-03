@@ -53,19 +53,10 @@ app.get('/genres', function(req, res) {
 })
 
 app.get('/info', function(req, res) {
-  //for every track in tracks
-  //  get audio features
-  //for every artist in artists
-  //  get related artists and top tracks(?)
   console.log('/info')
-
-  const methods = []
-  if(req.query.tracks) {
-    methods.push(get_track_features(req.query.tracks.toString()))
-  }
-  if(req.query.artists) {
-    methods.push(get_artists(req.query.artists.toString()))
-  }
+  const methods = req.query.tracks 
+    ? [get_track_features(req.query.tracks.toString())]
+    : []
 
   axios.all(methods)
   .then((results) => {
@@ -83,7 +74,6 @@ app.get('/info', function(req, res) {
 })
 
 app.get('/rec', function(req, res) {
-  //return recommendations
   console.log('/rec')
 
   if(req.query) {
@@ -102,7 +92,6 @@ app.get('/rec', function(req, res) {
     .then(response => {
       res.json(response.data) })
     .catch(error => {
-      // if(error.response.status===401) { get_access_token() }
       console.log(error.response)
       res.send({error})
     })
