@@ -41,7 +41,9 @@ export default {
     ])
   },
   created() {
-    this.getRecData()
+    if(this.seed_count) {
+      this.getRecData()
+    }
   },
   methods: {
     getRecData: function() {
@@ -68,13 +70,9 @@ export default {
         }
       }
 
-      console.log(params)
       axios.get('http://localhost:3000/rec', { params: params })
       .then(response => {
-        console.log(response)
         this.track_results = response.data.tracks
-
-        console.log(this.track_results)
       })
       .catch(error => {
         console.log(error)

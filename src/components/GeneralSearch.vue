@@ -80,7 +80,6 @@ export default {
       .then(response => {
         this.$store.commit('updateSongResults', response.data.tracks.items)
         this.$store.commit('updateArtistResults', response.data.artists.items)
-        console.log(response)
         this.no_results = !response.data.tracks.items.length || !response.data.artists.items.length
         this.display_query = this.query
       })
