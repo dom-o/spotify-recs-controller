@@ -54,7 +54,7 @@ app.get('/genres', function(req, res) {
 
 app.get('/info', function(req, res) {
   console.log('/info')
-  const methods = req.query.tracks 
+  const methods = req.query.tracks
     ? [get_track_features(req.query.tracks.toString())]
     : []
 
@@ -100,7 +100,7 @@ app.get('/rec', function(req, res) {
 
 app.listen(port, () => console.log(`Listening on port ${port}!`))
 get_access_token()
-const token_interval = setInterval(get_access_token, 3600000)
+const token_interval = setInterval(get_access_token, 3300000)
 
 function get_track_features(ids) {
   return axios.get('/audio-features', {
