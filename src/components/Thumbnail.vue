@@ -21,7 +21,7 @@
   flex: 0 0 auto;
   justify-content:center;
   overflow:hidden;
-  background-color: lightgrey;
+  background-color: #ddd;
   margin: 0.25rem 1rem 0.25rem 0.5rem;
   border-radius:5px;
 }
@@ -39,7 +39,7 @@
   width:100%;
   height:100%;
   display:inline-block;
-  background-color: lightgrey;
+  background-color: #ddd;
 }
 </style>
 

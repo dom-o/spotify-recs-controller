@@ -8,6 +8,7 @@
     }"
   >
     <BaseCheckbox
+      class="checkbox__check"
       :id="genre"
       :checked="seed_genres.includes(genre)"
       :disabled="seed_count>=5 && !seed_genres.includes(genre)"
@@ -24,6 +25,9 @@
   align-content: center;
   padding: 0.3rem 0.35rem;
   width: auto;
+}
+.checkbox__check {
+  margin-right: 0.25rem;
 }
 </style>
 

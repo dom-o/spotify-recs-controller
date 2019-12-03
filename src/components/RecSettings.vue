@@ -89,7 +89,7 @@
 <style lang='css' scoped>
 .wrapper--col {
   margin-bottom: 2rem;
-  border-top: 1px solid black;
+  border-top: 1px solid #fff;
   padding-top: 0rem;
 }
 table {
@@ -97,7 +97,7 @@ table {
 }
 th,td {
   text-align: center;
-  border: 1px solid black;
+  border: 1px solid #fff;
 }
 </style>
 
