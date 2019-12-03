@@ -15,7 +15,7 @@
     "cors": "^2.8.5",
     "dotenv": "^8.0.0",
     "es6-promise": "^4.2.8",
-    "express-validator": "^6.2.0",
+    "express-validator": "^6.3.0",
     "vue": "^2.6.10",
     "vue-router": "^3.0.7",
     "vuex": "^3.1.1"
