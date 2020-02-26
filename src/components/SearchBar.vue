@@ -1,4 +1,4 @@
-<template>
+<template lang="html">
 <div>
 <nav>
   <h4 class="nav__link--forward"><router-link to='/recsettings'>next</router-link></h4>
