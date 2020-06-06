@@ -5,12 +5,8 @@
 </template>
 
 <script>
-import SearchBar from './components/SearchBar.vue'
 export default {
   name: 'app',
-  components: {
-    SearchBar
-  }
 }
 </script>
 
