@@ -1,15 +1,18 @@
 import Vue from 'vue'
 import Vuex from 'vuex'
+import persistDataPlugin from '../plugins/persist-data'
 
 Vue.use(Vuex)
 
 export default new Vuex.Store({
+  plugins: [persistDataPlugin],
   state: {
     seed_songs: [],
     seed_genres: [],
     seed_artists: [],
     song_results: [],
     artist_results: [],
+    song_recs: [],
     audio_features: {
       acousticness: {
         name:'acousticness',
@@ -148,6 +151,23 @@ export default new Vuex.Store({
     },
     updateArtistResults(state, data) {
       state.artist_results = data
+    },
+    updateSongRecs(state, data) {
+      state.song_recs = data
+    },
+    setSeedSongs(state, seeds) {
+      state.seed_songs = seeds
+    },
+    setSeedGenres(state, seeds) {
+      state.seed_genres = seeds
+    },
+    setSeedArtists(state, seeds) {
+      state.seed_artists = seeds
+    },
+    setAudioFeatures(state, features) {
+      state.audio_features = features
+    },
+    retrieveData(state, data) {
     }
   },
   getters: {
