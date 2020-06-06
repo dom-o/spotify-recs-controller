@@ -13,6 +13,58 @@ app.use(cors({
 app.use(express.json())
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 
+const redirect_uri = 'http://localhost:3000/callback'
+let song_id_list = []
+app.get('/login', function(req, res) {
+  console.log('/login')
+
+  const scope = 'playlist-modify-public user-read-email' //user-library-modify if we want to let the user add the songs to th eir library individually, playlist-modify-private if we want to interact with private playlists (we might)
+  res.redirect('https://accounts.spotify.com/authorize' +
+    '?response_type=code' +
+    '&client_id=' + process.env.CLIENT_ID +
+    (scope ? '&scope=' + encodeURIComponent(scope) : '') +
+    '&redirect_uri=' + encodeURIComponent(redirect_uri) //+
+    // '&state=' +
+  )
+})
+
+app.get('/callback', function(req, res) {
+  console.log('/callback')
+  const params = {
+    client_id: process.env.CLIENT_ID,
+    client_secret: process.env.CLIENT_SECRET,
+    grant_type: 'authorization_code',
+    code: req.query.code,
+    redirect_uri: redirect_uri,
+  }
+  const urlParams = Object.entries(params)
+    .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+    .join('&')
+
+  const payload = process.env.CLIENT_ID+':'+process.env.CLIENT_SECRET
+  const encodedPayload = new Buffer(payload).toString('base64')
+
+  axios.post('https://accounts.spotify.com/api/token', urlParams, {
+    headers: {
+      'Authorization': 'Basic ' + encodedPayload,
+      "Content-Type": "application/x-www-form-urlencoded",
+    },
+  })
+  .then(response => {
+    console.log(response.data)
+    process.env.ACCESS_TOKEN = response.data.access_token
+    process.env.REFRESH_TOKEN = response.data.refresh_token
+    res.redirect('http://localhost:8080/export'+
+      '?access_token=' + encodeURIComponent(process.env.ACCESS_TOKEN) +
+      '&refresh_token=' + encodeURIComponent(process.env.REFRESH_TOKEN)
+    )
+  })
+  .catch(error => {
+    console.log('error')
+    res.send({error})
+  })
+})
+
 app.get('/search', function(req, res) {
   console.log('/search')
   console.log(req.query)
@@ -80,7 +132,6 @@ app.get('/rec', function(req, res) {
     for(let key in req.query) {
       req.query[key] = req.query[key].toString()
     }
-
 
     axios.get('/recommendations', {
       baseURL: 'https://api.spotify.com/v1/',
