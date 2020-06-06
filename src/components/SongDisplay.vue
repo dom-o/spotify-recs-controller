@@ -14,7 +14,11 @@
     />
     <section class="wrapper--col"><strong>{{ song.name }}</strong> <span>{{ getArtistList(song.artists) }}</span></section>
   </a>
-  <audio class="song__audio" controls :src="song.preview_url"></audio>
+  <audio class="song__audio"
+    :src="song.preview_url"
+    :disabled="!song.preview_url"
+    :controls="song.preview_url"
+  ></audio>
 </div>
 </template>
 

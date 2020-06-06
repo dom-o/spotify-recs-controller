@@ -10,7 +10,7 @@ body{
 	max-width:45em;
 	padding:0 .62em;
 	font:1em/1.62 sans-serif;
-  background-color: #111;
+  background-color: #222;
   color: #fff
 }
 @media print{
@@ -29,10 +29,15 @@ ul, ol, dd {
   list-style:none;
 }
 input, select, textarea {
-  color: #111;
-  background-color: #fff;
+  color: #222;
+  /* background-color: #fff; */
 }
-
+input:disabled, select:disabled, textarea:disabled {
+  opacity: 0.5;
+}
+*:disabled {
+  opacity: 0.5;
+}
 .nav__link--forward { float: right; }
 .nav__link--backward { float: left; }
 .checkbox {
