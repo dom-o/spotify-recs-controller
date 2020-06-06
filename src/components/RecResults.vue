@@ -6,13 +6,20 @@
 <SeedList />
 <h1>New tracks</h1>
 <ul v-if="seed_count>0">
-  <li v-for="track in this.track_results" :key="track.id">
+  <a class="export" href="http://localhost:3000/login">Save these tracks to a Spotify playlist</a>
+  <li v-for="track in this.track_recs" :key="track.id">
     <SongDisplay :song="track" />
   </li>
 </ul>
 <p v-else>This recommends you new music based on music you like already. <router-link to="/search">Pick some music you like first</router-link>.</p>
 </div>
 </template>
+
+<style lang="css" scoped>
+  h1 {
+    margin-bottom: 0.2rem;
+  }
+</style>
 
 <script>
 import axios from 'axios'
@@ -24,7 +31,7 @@ import SeedList from './SeedList.vue'
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 
 export default {
-  name: 'RecSettings',
+  name: 'RecResults',
   components: {
     SongDisplay,
     SeedList,
@@ -35,6 +42,7 @@ export default {
       seed_genres: state => state.seed_genres,
       seed_songs: state => state.seed_songs,
       audio_features: state => state.audio_features,
+      track_recs: state => state.song_recs,
     }),
     ...mapGetters([
       'seed_count',
@@ -73,6 +81,7 @@ export default {
       axios.get('http://localhost:3000/rec', { params: params })
       .then(response => {
         this.track_results = response.data.tracks
+        this.$store.commit('updateSongRecs', response.data.tracks)
       })
       .catch(error => {
         console.log(error)
@@ -81,7 +90,6 @@ export default {
   },
   data () {
     return {
-      track_results: []
     }
   }
 }

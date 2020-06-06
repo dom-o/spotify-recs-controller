@@ -8,6 +8,7 @@ import RecSettings from './components/RecSettings.vue'
 import RecResults from './components/RecResults.vue'
 import GenreSearch from './components/GenreSearch.vue'
 import GeneralSearch from './components/GeneralSearch.vue'
+import PlaylistExport from './components/PlaylistExport.vue'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
@@ -26,11 +27,13 @@ const routes = [
       props: true,
     }]
   },
-  { path: '/recsettings', component:RecSettings },
-  { path: '/results', component:RecResults }
+  { path: '/recsettings', component: RecSettings },
+  { path: '/results', component: RecResults },
+  { path: '/export', component: PlaylistExport}
 ]
 
 const router = new VueRouter({
+  mode: 'history',
   routes
 })
 
