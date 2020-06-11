@@ -69,6 +69,12 @@ export default {
       'seed_count'
     ]),
   },
+  created() {
+    if(this.$route.query && this.$route.query.new === 'true') {
+      this.$store.commit('clearStorage')
+      this.$store.commit('resetState')
+    }
+  },
   methods: {
     toggleSeed: function(seed, type, toggle) {
       if(toggle) {
@@ -79,9 +85,7 @@ export default {
     }
   },
   data () {
-    return {
-
-    }
+    return {}
   }
 }
 </script>
