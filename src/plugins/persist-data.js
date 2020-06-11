@@ -35,12 +35,27 @@ const plugin = store => {
         localStorage.setItem('audio_features', JSON.stringify(state.audio_features))
       } catch (error) {}
     }
+    if(mutation.type === 'setUserAccessToken') {
+      try {
+        localStorage.setItem('user_access_token', JSON.stringify(state.user_access_token))
+      } catch (error) {}
+    }
+    if(mutation.type === 'setUserRefreshToken') {
+      try{
+        localStorage.setItem('user_refresh_token', JSON.stringify(state.user_refresh_token))
+      } catch (error) {}
+    }
     if(mutation.type === 'retrieveData') {
       retrieveStorage('song_recs', 'updateSongRecs', store)
       retrieveStorage('audio_features', 'setAudioFeatures', store)
       retrieveStorage('seed_artists', 'setSeedArtists', store)
       retrieveStorage('seed_genres', 'setSeedGenres', store)
       retrieveStorage('seed_songs', 'setSeedSongs', store)
+      retrieveStorage('user_access_token', 'setUserAccessToken', store)
+      retrieveStorage('user_refresh_token', 'setUserRefreshToken', store)
+    }
+    if(mutation.type === 'clearStorage') {
+      localStorage.clear()
     }
   })
 }

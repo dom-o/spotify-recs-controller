@@ -4,15 +4,16 @@ import persistDataPlugin from '../plugins/persist-data'
 
 Vue.use(Vuex)
 
-export default new Vuex.Store({
-  plugins: [persistDataPlugin],
-  state: {
+const getDefaultState = () => {
+  return {
     seed_songs: [],
     seed_genres: [],
     seed_artists: [],
     song_results: [],
     artist_results: [],
     song_recs: [],
+    user_access_token: null,
+    user_refresh_token: null,
     audio_features: {
       acousticness: {
         name:'acousticness',
@@ -99,7 +100,12 @@ export default new Vuex.Store({
         on: false, number:0, number2:null, compareOption: 'exactly', min: 0.0, max: 1.0
       },
     }
-  },
+  }
+}
+
+export default new Vuex.Store({
+  plugins: [persistDataPlugin],
+  state: getDefaultState(),
   mutations: {
     removeArtist(state, seed_to_remove) {
       state.seed_artists = state.seed_artists.filter(seed => seed.id != seed_to_remove.id)
@@ -167,7 +173,16 @@ export default new Vuex.Store({
     setAudioFeatures(state, features) {
       state.audio_features = features
     },
-    retrieveData(state, data) {
+    setUserAccessToken(state, token) {
+      state.user_access_token = token
+    },
+    setUserRefreshToken(state, token) {
+      state.user_refresh_token = token
+    },
+    retrieveData(state) {},
+    clearStorage(state) {},
+    resetState(state) {
+      Object.assign(state, getDefaultState())
     }
   },
   getters: {
