@@ -1,12 +1,13 @@
 <template lang="html">
 <div>
 <nav>
-  <h4 class="nav__link--backward"><router-link to='/recsettings'>back</router-link></h4>
+  <h4 class="nav__link--backward"><router-link to="/recsettings">back</router-link></h4>
+  <h4 class="nav__link--forward"><router-link to="/export">save these songs to a new playlist</router-link></h4>
 </nav>
 <SeedList />
 <h1>New tracks</h1>
 <ul v-if="seed_count>0">
-  <a class="export" href="http://localhost:3000/login">Save these tracks to a Spotify playlist</a>
+  <button v-on:click="getRecData">reload recommendations</button>
   <li v-for="track in this.track_recs" :key="track.id">
     <SongDisplay :song="track" />
   </li>
@@ -16,9 +17,9 @@
 </template>
 
 <style lang="css" scoped>
-  h1 {
-    margin-bottom: 0.2rem;
-  }
+h1 {
+  margin-bottom: 0.2rem;
+}
 </style>
 
 <script>
@@ -49,7 +50,7 @@ export default {
     ])
   },
   created() {
-    if(this.seed_count) {
+    if(this.seed_count && this.track_recs.length === 0) {
       this.getRecData()
     }
   },
@@ -89,8 +90,7 @@ export default {
     }
   },
   data () {
-    return {
-    }
+    return {}
   }
 }
 </script>
