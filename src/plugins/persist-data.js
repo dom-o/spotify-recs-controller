@@ -4,29 +4,25 @@ const plugin = store => {
       try {
         localStorage.setItem('song_recs', JSON.stringify(state.song_recs))
       } catch(error) {}
-    }
-    if(mutation.type === 'addSong' ||
+    } else if(mutation.type === 'addSong' ||
       mutation.type === 'removeSong')
     {
       try {
         localStorage.setItem('seed_songs', JSON.stringify(state.seed_songs))
       } catch(error) {}
-    }
-    if(mutation.type === 'addArtist' ||
+    } else if(mutation.type === 'addArtist' ||
       mutation.type === 'removeArtist')
     {
       try {
         localStorage.setItem('seed_artists', JSON.stringify(state.seed_artists))
       } catch(error) {}
-    }
-    if(mutation.type === 'addGenre' ||
+    } else if(mutation.type === 'addGenre' ||
       mutation.type === 'removeGenre')
     {
       try {
         localStorage.setItem('seed_genres', JSON.stringify(state.seed_genres))
       } catch(error) {}
-    }
-    if(mutation.type === 'toggleAudioFeature' ||
+    } else if(mutation.type === 'toggleAudioFeature' ||
       mutation.type === 'changeCompareOption' ||
       mutation.type === 'changeFeatureNumber' ||
       mutation.type === 'changeSecondFeatureNumber')
@@ -34,27 +30,35 @@ const plugin = store => {
       try {
         localStorage.setItem('audio_features', JSON.stringify(state.audio_features))
       } catch (error) {}
-    }
-    if(mutation.type === 'setUserAccessToken') {
+    } else if(mutation.type === 'setAccessToken') {
       try {
-        localStorage.setItem('user_access_token', JSON.stringify(state.user_access_token))
+        localStorage.setItem('access_token', JSON.stringify(state.access_token))
       } catch (error) {}
-    }
-    if(mutation.type === 'setUserRefreshToken') {
+    } else if(mutation.type === 'setRefreshToken') {
       try{
-        localStorage.setItem('user_refresh_token', JSON.stringify(state.user_refresh_token))
+        localStorage.setItem('refresh_token', JSON.stringify(state.refresh_token))
       } catch (error) {}
-    }
-    if(mutation.type === 'retrieveData') {
+    } else if(mutation.type === 'retrieveData') {
       retrieveStorage('song_recs', 'updateSongRecs', store)
       retrieveStorage('audio_features', 'setAudioFeatures', store)
       retrieveStorage('seed_artists', 'setSeedArtists', store)
       retrieveStorage('seed_genres', 'setSeedGenres', store)
       retrieveStorage('seed_songs', 'setSeedSongs', store)
-      retrieveStorage('user_access_token', 'setUserAccessToken', store)
-      retrieveStorage('user_refresh_token', 'setUserRefreshToken', store)
-    }
-    if(mutation.type === 'clearStorage') {
+      retrieveStorage('access_token', 'setAccessToken', store)
+      retrieveStorage('refresh_token', 'setRefreshToken', store)
+    } else if(mutation.type === 'retrieveAuthData') {
+      retrieveStorage('access_token', 'setAccessToken', store)
+      retrieveStorage('refresh_token', 'setRefreshToken', store)
+    } else if (mutation.type === 'resetSearchState') {
+      localStorage.removeItem('song_recs')
+      localStorage.removeItem('audio_features')
+      localStorage.removeItem('seed_artists')
+      localStorage.removeItem('seed_genres')
+      localStorage.removeItem('seed_songs')
+    } else if(mutation.type === 'resetAuthState') {
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('access_token')
+    } else if(mutation.type === 'clearStorage') {
       localStorage.clear()
     }
   })
