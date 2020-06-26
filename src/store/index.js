@@ -12,8 +12,9 @@ const getDefaultState = () => {
     song_results: [],
     artist_results: [],
     song_recs: [],
-    user_access_token: null,
-    user_refresh_token: null,
+    access_token: null,
+    refresh_token: null,
+    token_expire: null,
     audio_features: {
       acousticness: {
         name:'acousticness',
@@ -173,14 +174,26 @@ export default new Vuex.Store({
     setAudioFeatures(state, features) {
       state.audio_features = features
     },
-    setUserAccessToken(state, token) {
-      state.user_access_token = token
+    setAccessToken(state, token) {
+      state.access_token = token
     },
-    setUserRefreshToken(state, token) {
-      state.user_refresh_token = token
+    setRefreshToken(state, token) {
+      state.refresh_token = token
     },
     retrieveData(state) {},
+    retrieveAuthData(state) {},
     clearStorage(state) {},
+    resetSearchState(state) {
+      const access = state.access_token
+      const refresh = state.refresh_token
+      Object.assign(state, getDefaultState())
+      state.access_token = access
+      state.refresh_token = refresh
+    },
+    resetAuthState(state) {
+      state.access_token = getDefaultState().access_token
+      state.refresh_token = getDefaultState().refresh_token
+    },
     resetState(state) {
       Object.assign(state, getDefaultState())
     }
