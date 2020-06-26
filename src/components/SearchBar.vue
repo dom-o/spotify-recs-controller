@@ -1,7 +1,7 @@
 <template lang="html">
 <div>
 <nav>
-  <h4 class="nav__link--forward"><router-link to='/recsettings'>next</router-link></h4>
+  <h4 class="nav__link--forward"><router-link to='/recsettings'>fine tune song features</router-link></h4>
 </nav>
 <h1 style="clear: both;">Seeds ({{ seed_count }}/5)</h1>
 <ul v-if="seed_count>0" class="seed__list">
@@ -71,8 +71,7 @@ export default {
   },
   created() {
     if(this.$route.query && this.$route.query.new === 'true') {
-      this.$store.commit('clearStorage')
-      this.$store.commit('resetState')
+      this.$store.commit('resetSearchState')
     }
   },
   methods: {
