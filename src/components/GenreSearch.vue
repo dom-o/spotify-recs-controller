@@ -20,7 +20,10 @@
 <script>
 import { mapState, mapGetters } from 'vuex'
 import axios from 'axios'
+import axiosRetry from 'axios-retry'
 import Genre from './Genre.vue'
+
+axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 
 export default {
   name: 'GenreSearch',
