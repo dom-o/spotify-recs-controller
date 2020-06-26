@@ -22,7 +22,7 @@ axios.interceptors.response.use(null, (error) =>{
         'Authorization': 'Basic '+ encodedPayload,
         'Content-Type': 'application/x-www-form-urlencoded',
       },
-    })).then((response) => {
+    })).then(response => {
       process.env.ACCESS_TOKEN = response.data.access_token
       error.config.headers['Authorization'] = 'Bearer '+ process.env.ACCESS_TOKEN
       return axios.request(error.config)
@@ -31,9 +31,15 @@ axios.interceptors.response.use(null, (error) =>{
   return Promise.reject(error)
 })
 
+
 app.get('/refresh', function(req, res) {
   console.log('/refresh')
+  let refresh_token = null
   if(req.query.refresh_token) {
+    refresh_token = req.query.refresh_token
+  }
+
+  if(refresh_token) {
     axios.post('https://accounts.spotify.com/api/token',
     'grant_type=refresh_token&refresh_token='+refresh_token,
     {
@@ -66,8 +72,6 @@ app.get('/login', function(req, res) {
 app.get('/callback', function(req, res) {
   console.log('/callback')
   const params = {
-    client_id: process.env.CLIENT_ID,
-    client_secret: process.env.CLIENT_SECRET,
     grant_type: 'authorization_code',
     code: req.query.code,
     redirect_uri: redirect_uri,
