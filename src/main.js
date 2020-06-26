@@ -27,9 +27,9 @@ const routes = [
       props: true,
     }]
   },
-  { path: '/recsettings', component: RecSettings },
-  { path: '/results', component: RecResults },
-  { path: '/export', component: PlaylistExport}
+  { path: '/recsettings', name: 'Settings', component: RecSettings },
+  { path: '/results', name: 'Results', component: RecResults },
+  { path: '/export', name: 'Export', component: PlaylistExport}
 ]
 
 const router = new VueRouter({
