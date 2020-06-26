@@ -28,7 +28,7 @@ ul, ol, dd {
   padding:0;
   list-style:none;
 }
-input, select, textarea {
+input, select, textarea, button {
   color: #222;
   /* background-color: #fff; */
 }
