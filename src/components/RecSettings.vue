@@ -2,7 +2,7 @@
 <div>
 <nav>
   <h4 class="nav__link--backward"><router-link to='/search' >back</router-link></h4>
-  <h4 class="nav__link--forward"><router-link to='/results' >next</router-link></h4>
+  <h4 class="nav__link--forward"><router-link to='/results' >get your recomendations</router-link></h4>
 </nav>
 <SeedList />
 <h1>Tracklist settings</h1>
