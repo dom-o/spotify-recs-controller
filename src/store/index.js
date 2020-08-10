@@ -180,8 +180,8 @@ export default new Vuex.Store({
     setRefreshToken(state, token) {
       state.refresh_token = token
     },
-    retrieveData(state) {},
-    retrieveAuthData(state) {},
+    retrieveState(state) {},
+    retrieveAuthState(state) {},
     clearStorage(state) {},
     resetSearchState(state) {
       const access = state.access_token

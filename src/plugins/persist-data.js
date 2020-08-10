@@ -46,7 +46,7 @@ const plugin = store => {
       retrieveStorage('seed_songs', 'setSeedSongs', store)
       retrieveStorage('access_token', 'setAccessToken', store)
       retrieveStorage('refresh_token', 'setRefreshToken', store)
-    } else if(mutation.type === 'retrieveAuthData') {
+    } else if(mutation.type === 'retrieveAuthState') {
       retrieveStorage('access_token', 'setAccessToken', store)
       retrieveStorage('refresh_token', 'setRefreshToken', store)
     } else if (mutation.type === 'resetSearchState') {
