@@ -3,20 +3,24 @@ const express = require('express')
 const axios = require('axios')
 const axiosRetry = require('axios-retry')
 const cors = require('cors')
+const cookieParser = require('cookie-parser')
 const app = express()
 const port = 3000
 const payload = process.env.CLIENT_ID+':'+process.env.CLIENT_SECRET
 const encodedPayload = new Buffer(payload).toString('base64')
 const redirect_uri = 'http://localhost:3000/callback'
 
-app.use(cors({
-  origin: 'http://localhost:8080',
-  credentials: true,
-}))
 app.use(express.json())
+   .use(cookieParser())
+   .use(cors({
+     origin: 'http://localhost:8080',
+     credentials: true,
+   }))
+
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 axios.interceptors.response.use(null, (error) =>{
   if(error.config && error.response && error.response.status === 401) {
+    console.log('error, interceptor')
     return (axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
       headers: {
         'Authorization': 'Basic '+ encodedPayload,
@@ -56,44 +60,67 @@ app.get('/refresh', function(req, res) {
   }
 })
 
+function randomString(len) {
+  let str = ''
+  let charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+  for (var i=0; i<len; i++) {
+    str += charSet[Math.floor(Math.random() * charSet.length)]
+  }
+  return str
+}
+stateKey = 'spotify_auth_state'
+
 app.get('/login', function(req, res) {
   console.log('/login')
+  const state = randomString(16)
+  res.cookie(stateKey, state)
   const scope = 'playlist-modify-public user-read-email' //user-library-modify if we want to let the user add the songs to their library individually, playlist-modify-private if we want to interact with private playlists (we might)
   res.redirect('https://accounts.spotify.com/authorize' +
     '?response_type=code' +
     '&client_id=' + process.env.CLIENT_ID +
     (scope ? '&scope=' + encodeURIComponent(scope) : '') +
     '&redirect_uri=' + encodeURIComponent(redirect_uri) +
-    '&show_dialog=true'//+
-    // '&state=' +
+    '&show_dialog=true' +
+    '&state=' + state
   )
 })
 
 app.get('/callback', function(req, res) {
   console.log('/callback')
-  const params = {
-    grant_type: 'authorization_code',
-    code: req.query.code,
-    redirect_uri: redirect_uri,
-  }
-  const urlParams = Object.entries(params)
-    .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
-    .join('&')
+  let state = req.query.state
+  let storedState = req.cookies ? req.cookies[stateKey] : null
 
-  axios.post('https://accounts.spotify.com/api/token', urlParams, {
-    headers: {
-      'Authorization': 'Basic ' + encodedPayload,
-      "Content-Type": "application/x-www-form-urlencoded",
-    },
-  }).then(response => {
-    res.redirect('http://localhost:8080/export'+
-      '?access_token=' + encodeURIComponent(response.data.access_token) +
-      '&refresh_token=' + encodeURIComponent(response.data.refresh_token)
-    )
-  }).catch(error => {
-    console.log('error')
-    res.send({error})
-  })
+  if(state === null || state !== storedState) {
+    //ERROR
+    res.status(500).send('State mismatch')
+  } else {
+    res.clearCookie(stateKey)
+    const params = {
+      grant_type: 'authorization_code',
+      code: req.query.code,
+      redirect_uri: redirect_uri,
+    }
+    const urlParams = Object.entries(params)
+      .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
+      .join('&')
+
+    axios.post('https://accounts.spotify.com/api/token', urlParams, {
+      headers: {
+        'Authorization': 'Basic ' + encodedPayload,
+        "Content-Type": "application/x-www-form-urlencoded",
+      },
+    }).then(response => {
+      process.env.USER_ACCESS_TOKEN = response.data.access_token
+      process.env.USER_REFRESH_TOKEN = response.data.refresh_token
+      res.redirect('http://localhost:8080/export'+
+        '?access_token=' + encodeURIComponent(response.data.access_token) +
+        '&refresh_token=' + encodeURIComponent(response.data.refresh_token)
+      )
+    }).catch(error => {
+      console.log('error')
+      res.send({error})
+    })
+  }
 })
 
 app.get('/search', function(req, res) {
