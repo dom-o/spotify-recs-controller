@@ -12,6 +12,7 @@
 
   <!-- also don't show this until you ARE logged in -->
   <template v-else>
+    <button @click="logOut">Log out</button>
     <form @submit.prevent="processForm">
       <input v-model="playlist_name" required type="text">
       <input type="submit" value="create playlist">
@@ -35,13 +36,17 @@ import axiosRetry from 'axios-retry'
 import { mapState } from 'vuex'
 
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
+
 axios.interceptors.response.use(null, (error) =>{
-  if(error.config && error.response && error.response.status === 401) {
-    return (axios.post('http://localhost:3000/refresh', {
-      params: { refresh_token:this.refresh_token },
+  let refresh_token = localStorage.getItem('refresh_token')
+  
+  if(refresh_token && error.config && error.response && error.response.status === 401) {
+    refresh_token = JSON.parse(refresh_token)
+    return (axios.get('http://localhost:3000/refresh', {
+      params: { refresh_token: refresh_token },
     })).then(response => {
-      this.$store.commit('setAccessToken', response.data.access_token)
-      error.config.headers['Authorization'] = 'Bearer '+ this.access_token
+      localStorage.setItem('access_token', response.data.access_token)
+      error.config.headers['Authorization'] = 'Bearer '+ response.data.access_token
       return axios.request(error.config)
     })
   }
@@ -62,15 +67,19 @@ export default {
   },
   created() {
     if (this.$route.query && this.$route.query.access_token && this.$route.query.refresh_token) {
-      this.$store.commit('retrieveData')
+      this.$store.commit('retrieveState')
       this.$store.commit('setAccessToken', this.$route.query.access_token)
       this.$store.commit('setRefreshToken', this.$route.query.refresh_token)
     } else if (!this.access_token || !this.refresh_token) {
-      this.$store.commit('retrieveAuthData')
+      this.$store.commit('retrieveAuthState')
     }
   },
   methods: {
+    logOut: function() {
+      this.$store.commit('resetAuthState')
+    },
     processForm: function () {
+      this.$store.commit('retrieveAuthState')
       axios.get('https://api.spotify.com/v1/me', {
         headers: {
           'Authorization': 'Bearer '+ this.access_token
