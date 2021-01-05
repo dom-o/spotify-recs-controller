@@ -9,7 +9,7 @@
     "api": "node server.js"
   },
   "dependencies": {
-    "axios": "^0.19.2",
+    "axios": "^0.21.1",
     "axios-retry": "^3.1.8",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
