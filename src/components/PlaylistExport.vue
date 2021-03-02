@@ -4,10 +4,9 @@
   <h4 class="nav__link--backward"><router-link to="/results">back</router-link></h4>
   <h4 class="nav__link--forward"><router-link to="/search?new=true">new search</router-link></h4>
 </nav>
-
-<div v-if="song_recs.length>0">
+<div style="clear: both;" v-if="song_recs.length>0">
   <template v-if="!loggedIn">
-    <a href="http://localhost:3000/login">First, log in to Spotify.</a>
+    First, <a href="http://localhost:3000/login">log in</a> to Spotify.
   </template>
 
   <!-- also don't show this until you ARE logged in -->
@@ -17,13 +16,13 @@
       <input v-model="playlist_name" required type="text">
       <input type="submit" value="create playlist">
     </form>
-    <p v-if="playlist_success">Playlist "{{this.playlist_name}}" successfully created.</p>
+    <p v-if="playlist_success">Playlist "{{this.playlist_name}}" created successfully. <a :href="this.playlist_url">Listen</a> to it.</p>
 
     <!-- expound upon this error message -->
     <p v-if="playlist_failure">Error creating playlist.</p>
   </template>
 </div>
-<p v-else>There's no songs to add to this playlist. <router-link to="/search">Get some first</router-link></p>
+<p style="clear: both;" v-else>There's no songs to add to this playlist. <router-link to="/search">Add some first</router-link>.</p>
 </div>
 </template>
 
@@ -37,22 +36,6 @@ import { mapState } from 'vuex'
 
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 
-axios.interceptors.response.use(null, (error) =>{
-  let refresh_token = localStorage.getItem('refresh_token')
-  
-  if(refresh_token && error.config && error.response && error.response.status === 401) {
-    refresh_token = JSON.parse(refresh_token)
-    return (axios.get('http://localhost:3000/refresh', {
-      params: { refresh_token: refresh_token },
-    })).then(response => {
-      localStorage.setItem('access_token', response.data.access_token)
-      error.config.headers['Authorization'] = 'Bearer '+ response.data.access_token
-      return axios.request(error.config)
-    })
-  }
-  return Promise.reject(error)
-})
-
 export default {
   name: 'PlaylistExport',
   computed: {
@@ -61,54 +44,41 @@ export default {
       access_token: state => state.access_token,
       refresh_token: state => state.refresh_token
     }),
-    loggedIn: function() {
-      return this.access_token && this.refresh_token
-    }
   },
   created() {
-    if (this.$route.query && this.$route.query.access_token && this.$route.query.refresh_token) {
-      this.$store.commit('retrieveState')
-      this.$store.commit('setAccessToken', this.$route.query.access_token)
-      this.$store.commit('setRefreshToken', this.$route.query.refresh_token)
-    } else if (!this.access_token || !this.refresh_token) {
-      this.$store.commit('retrieveAuthState')
-    }
+    this.$store.commit('retrieveState')
+    this.checkLoggedIn()
   },
   methods: {
+    checkLoggedIn: function() {
+      axios.get('http://localhost:3000/isLoggedIn').then(response => {
+        this.loggedIn = response.data
+      }).catch(error => {
+        console.log(error)
+        this.loggedIn = false
+      })
+    },
     logOut: function() {
-      this.$store.commit('resetAuthState')
+      //tell the server to flush user data
+      this.loggedIn = false
+      axios.post('http://localhost:3000/logout')
+      .then(response => {
+        console.log(response)
+        //indicate success
+      }).catch(error => {
+        console.log(error)
+      })
     },
     processForm: function () {
-      this.$store.commit('retrieveAuthState')
-      axios.get('https://api.spotify.com/v1/me', {
-        headers: {
-          'Authorization': 'Bearer '+ this.access_token
-        },
-      }).then( response => {
-        const user_id = response.data.id
-        const name = this.playlist_name ? this.playlist_name : 'recs-controller-export'
-        axios.post("https://api.spotify.com/v1/users/"+user_id+"/playlists", JSON.stringify({name: name}), {
-          headers: {
-            'Authorization': 'Bearer '+ this.access_token,
-            'Content-Type': 'application/json',
-          },
-        }).then( response => {
-          const playlist_id = response.data.id
-          axios.post('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks', JSON.stringify({uris:this.getSongIds()}), {
-            headers: {
-              'Authorization': 'Bearer '+ this.access_token,
-              'Content-Type': 'application/json',
-            },
-          }).then(response => {
-            this.playlist_success = true
-          }).catch(error => {
-            console.log(error)
-            this.playlist_failure = true
-          })
-        }).catch(error => {
-          console.log(error)
-          this.playlist_failure = true
-        })
+      axios.get('http://localhost:3000/playlist', {
+        params: {
+          uris: this.getSongIds(),
+          playlist_name: this.playlist_name
+        }
+      }).then(response => {
+        console.log(response.data)
+        this.playlist_url = response.data
+        this.playlist_success = true
       }).catch(error => {
         console.log(error)
         this.playlist_failure = true
@@ -120,7 +90,9 @@ export default {
   },
   data() {
     return {
+      loggedIn: false,
       playlist_name: "",
+      playlist_url: "",
       playlist_success: false,
       playlist_failure: false,
     }

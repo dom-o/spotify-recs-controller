@@ -29,37 +29,18 @@ const plugin = store => {
       try {
         localStorage.setItem('audio_features', JSON.stringify(state.audio_features))
       } catch (error) {}
-    } else if(mutation.type === 'setAccessToken') {
-      try {
-        localStorage.setItem('access_token', JSON.stringify(state.access_token))
-        localStorage.setItem('auth_ts', new Date().getTime() + persistInterval)
-      } catch (error) {}
-    } else if(mutation.type === 'setRefreshToken') {
-      try{
-        localStorage.setItem('refresh_token', JSON.stringify(state.refresh_token))
-        localStorage.setItem('auth_ts', new Date().getTime() + persistInterval)
-      } catch (error) {}
     } else if(mutation.type === 'retrieveState') {
       retrieveStorage('song_recs', 'updateSongRecs', store)
       retrieveStorage('audio_features', 'setAudioFeatures', store)
       retrieveStorage('seed_artists', 'setSeedArtists', store)
       retrieveStorage('seed_genres', 'setSeedGenres', store)
       retrieveStorage('seed_songs', 'setSeedSongs', store)
-      retrieveStorage('access_token', 'setAccessToken', store, 'auth_ts')
-      retrieveStorage('refresh_token', 'setRefreshToken', store, 'auth_ts')
-    } else if(mutation.type === 'retrieveAuthState') {
-      retrieveStorage('access_token', 'setAccessToken', store, 'auth_ts')
-      retrieveStorage('refresh_token', 'setRefreshToken', store, 'auth_ts')
     } else if (mutation.type === 'resetSearchState') {
       localStorage.removeItem('song_recs')
       localStorage.removeItem('audio_features')
       localStorage.removeItem('seed_artists')
       localStorage.removeItem('seed_genres')
       localStorage.removeItem('seed_songs')
-    } else if(mutation.type === 'resetAuthState') {
-      localStorage.removeItem('refresh_token')
-      localStorage.removeItem('access_token')
-      localStorage.removeItem('auth_ts')
     } else if(mutation.type === 'clearStorage') {
       localStorage.clear()
     }
