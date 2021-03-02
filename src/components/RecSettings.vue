@@ -1,9 +1,9 @@
 <template lang="html">
 <div>
 <nav>
-  <h4 class="nav__link--backward"><router-link to='/search' >back</router-link></h4>
+  <h4 class="nav__link--backward"><router-link to='/search' >back to search</router-link></h4>
   <h4 class="nav__link--forward"><router-link to='/results' >get your recomendations</router-link></h4>
-</nav>
+  <router-link to="/search?new=true">new search</router-link></nav>
 <SeedList />
 <h1>Tracklist settings</h1>
 <p>
@@ -124,6 +124,7 @@ export default {
     ]),
   },
   created() {
+    this.$store.commit('retrieveState')
     if(this.seed_songs.length) {
       this.getSeedData()
     }

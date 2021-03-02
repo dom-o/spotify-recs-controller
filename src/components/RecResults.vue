@@ -1,8 +1,9 @@
 <template lang="html">
 <div>
 <nav>
-  <h4 class="nav__link--backward"><router-link to="/recsettings">back</router-link></h4>
+  <h4 class="nav__link--backward"><router-link to="/recsettings">back to settings</router-link></h4>
   <h4 class="nav__link--forward"><router-link to="/export">save these songs to a new playlist</router-link></h4>
+  <router-link to="/search?new=true">new search</router-link>
 </nav>
 <SeedList />
 <h1>New tracks</h1>
@@ -50,6 +51,7 @@ export default {
     ])
   },
   created() {
+    this.$store.commit('retrieveState')
     if(this.seed_count && this.track_recs.length === 0) {
       this.getRecData()
     }
