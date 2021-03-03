@@ -13,10 +13,11 @@
   <template v-else>
     <button @click="logOut">Log out</button>
     <form @submit.prevent="processForm">
-      <input v-model="playlist_name" required type="text">
+      <label>Name your playlist:
+      <input v-model="playlist_name" required type="text"></label>
       <input type="submit" value="create playlist">
     </form>
-    <p v-if="playlist_success">Playlist "{{this.playlist_name}}" created successfully. <a :href="this.playlist_url">Listen</a> to it.</p>
+    <p v-if="playlist_success">Playlist "{{this.created_playlist}}" was created. <a :href="this.playlist_url">Listen</a> to it!</p>
 
     <!-- expound upon this error message -->
     <p v-if="playlist_failure">Error creating playlist.</p>
@@ -76,8 +77,8 @@ export default {
           playlist_name: this.playlist_name
         }
       }).then(response => {
-        console.log(response.data)
-        this.playlist_url = response.data
+        this.playlist_url = response.data.playlist_url
+        this.created_playlist = response.data.playlist_name
         this.playlist_success = true
       }).catch(error => {
         console.log(error)
@@ -92,6 +93,7 @@ export default {
     return {
       loggedIn: false,
       playlist_name: "",
+      created_playlist: "",
       playlist_url: "",
       playlist_success: false,
       playlist_failure: false,

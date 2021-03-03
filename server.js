@@ -85,14 +85,14 @@ app.post('/logout', function(req, res) {
 app.get('/isLoggedIn', function(req, res) {
   console.log('/isLoggedIn')
   if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
-    res.send(false)
+    res.status(200).send(false)
   } else {
     axios.get('https://api.spotify.com/v1/me', {
       headers: {
         'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN
       }
     }).then(response => {
-      res.send(true)
+      res.status(200).send(true)
     }).catch(error => {
       res.send(false)
     })
@@ -145,7 +145,6 @@ app.get('/callback', function(req, res) {
 
       res.redirect('http://localhost:8080/export')
     }).catch(error => {
-      console.log('error')
       console.log(error)
       res.send({error})
     })
@@ -214,6 +213,7 @@ app.get('/rec', function(req, res) {
   console.log('/rec')
 
   if(req.query) {
+    console.log(req.query)
     for(let key in req.query) {
       req.query[key] = req.query[key].toString()
     }
@@ -238,10 +238,11 @@ app.get('/playlist', function(req, res) {
   console.log('/playlist')
   if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
     console.log('in /playlist, user tokens invalid')
-    res.status(400).send('User not logged into Spotify.')
+    res.status(500).send('User not logged into Spotify.')
   }
   else if(req.query.uris) {
     var playlist_url = ''
+    var name = ''
     axios.get('https://api.spotify.com/v1/me', {
       headers: {
         'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN
@@ -249,7 +250,7 @@ app.get('/playlist', function(req, res) {
     }).then(response => {
       console.log('user data aquired, creating playlist now')
       const user_id = response.data.id
-      const name = req.query.playlist_name ? req.query.playlist_name : 'recs-controller-export'
+      name = req.query.playlist_name ? req.query.playlist_name : 'recs-controller-export'
       return axios.post("https://api.spotify.com/v1/users/"+user_id+"/playlists", JSON.stringify({name: name}), {
         headers: {
           'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN,
@@ -268,7 +269,7 @@ app.get('/playlist', function(req, res) {
       })
     }).then(response => {
       console.log('tracks added, playlist success')
-      res.json(playlist_url)
+      res.json({playlist_url: playlist_url, playlist_name: name })
     }).catch(error => {
       console.log(error)
       res.send(error)
