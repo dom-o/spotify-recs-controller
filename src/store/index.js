@@ -6,6 +6,7 @@ Vue.use(Vuex)
 
 const getDefaultState = () => {
   return {
+    seed_params_changed: false,
     seed_songs: [],
     seed_genres: [],
     seed_artists: [],
@@ -105,14 +106,20 @@ export default new Vuex.Store({
   plugins: [persistDataPlugin],
   state: getDefaultState(),
   mutations: {
+    setSeedParamsChanged(state, value) {
+      state.seed_params_changed = Boolean(value)
+    },
     removeArtist(state, seed_to_remove) {
       state.seed_artists = state.seed_artists.filter(seed => seed.id != seed_to_remove.id)
+      state.seed_params_changed = true
     },
     removeGenre(state, seed_to_remove) {
       state.seed_genres = state.seed_genres.filter(seed => seed != seed_to_remove)
+      state.seed_params_changed = true
     },
     removeSong(state, seed_to_remove) {
       state.seed_songs = state.seed_songs.filter(seed => seed.id != seed_to_remove.id)
+      state.seed_params_changed = true
     },
     addArtist(state, seed) {
       if(
@@ -120,6 +127,7 @@ export default new Vuex.Store({
         && !state.seed_artists.some(el => el.id == seed.id)
       ) {
         state.seed_artists.push(seed)
+        state.seed_params_changed = true
       }
     },
     addGenre(state, seed) {
@@ -128,6 +136,7 @@ export default new Vuex.Store({
         && !state.seed_genres.includes(seed)
       ) {
         state.seed_genres.push(seed)
+        state.seed_params_changed = true
       }
     },
     addSong(state, seed) {
@@ -136,19 +145,24 @@ export default new Vuex.Store({
         && !state.seed_songs.some(el => el.id == seed.id)
       ) {
         state.seed_songs.push(seed)
+        state.seed_params_changed = true
       }
     },
     toggleAudioFeature(state, feature) {
       state.audio_features[feature.id].on = feature.data
+      state.seed_params_changed = true
     },
     changeCompareOption(state, feature) {
       state.audio_features[feature.id].compareOption = feature.data
+      state.seed_params_changed = true
     },
     changeFeatureNumber(state, feature) {
       state.audio_features[feature.id].number = feature.data
+      state.seed_params_changed = true
     },
     changeSecondFeatureNumber(state, feature) {
       state.audio_features[feature.id].number2 = feature.data
+      state.seed_params_changed = true
     },
     updateSongResults(state, data) {
       state.song_results = data
@@ -158,6 +172,7 @@ export default new Vuex.Store({
     },
     updateSongRecs(state, data) {
       state.song_recs = data
+      state.seed_params_changed = false
     },
     setSeedSongs(state, seeds) {
       state.seed_songs = seeds

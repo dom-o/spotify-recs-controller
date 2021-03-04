@@ -45,6 +45,7 @@ export default {
       seed_songs: state => state.seed_songs,
       audio_features: state => state.audio_features,
       track_recs: state => state.song_recs,
+      seed_params_changed: state => state.seed_params_changed,
     }),
     ...mapGetters([
       'seed_count',
@@ -52,7 +53,8 @@ export default {
   },
   created() {
     this.$store.commit('retrieveState')
-    if(this.seed_count && this.track_recs.length === 0) {
+    console.log(this.seed_params_changed)
+    if((this.seed_count && this.track_recs.length === 0) || (this.seed_params_changed)) {
       this.getRecData()
     }
   },

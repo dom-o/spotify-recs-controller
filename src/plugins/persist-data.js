@@ -6,20 +6,20 @@ const plugin = store => {
       try {
         localStorage.setItem('song_recs', JSON.stringify(state.song_recs))
       } catch(error) {}
-    } else if(mutation.type === 'addSong' || mutation.type === 'removeSong')
-    {
+    } else if(mutation.type === 'addSong' || mutation.type === 'removeSong') {
       try {
         localStorage.setItem('seed_songs', JSON.stringify(state.seed_songs))
+        localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
       } catch(error) {}
-    } else if(mutation.type === 'addArtist' || mutation.type === 'removeArtist')
-    {
+    } else if(mutation.type === 'addArtist' || mutation.type === 'removeArtist') {
       try {
         localStorage.setItem('seed_artists', JSON.stringify(state.seed_artists))
+        localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
       } catch(error) {}
-    } else if(mutation.type === 'addGenre' || mutation.type === 'removeGenre')
-    {
+    } else if(mutation.type === 'addGenre' || mutation.type === 'removeGenre') {
       try {
         localStorage.setItem('seed_genres', JSON.stringify(state.seed_genres))
+        localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
       } catch(error) {}
     } else if(mutation.type === 'toggleAudioFeature' ||
       mutation.type === 'changeCompareOption' ||
@@ -28,6 +28,7 @@ const plugin = store => {
     {
       try {
         localStorage.setItem('audio_features', JSON.stringify(state.audio_features))
+        localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
       } catch (error) {}
     } else if(mutation.type === 'retrieveState') {
       retrieveStorage('song_recs', 'updateSongRecs', store)
@@ -35,12 +36,14 @@ const plugin = store => {
       retrieveStorage('seed_artists', 'setSeedArtists', store)
       retrieveStorage('seed_genres', 'setSeedGenres', store)
       retrieveStorage('seed_songs', 'setSeedSongs', store)
+      retrieveStorage('seed_params_changed', 'setSeedParamsChanged', store)
     } else if (mutation.type === 'resetSearchState') {
       localStorage.removeItem('song_recs')
       localStorage.removeItem('audio_features')
       localStorage.removeItem('seed_artists')
       localStorage.removeItem('seed_genres')
       localStorage.removeItem('seed_songs')
+      localStorage.removeItem('seed_params_changed')
     } else if(mutation.type === 'clearStorage') {
       localStorage.clear()
     }
