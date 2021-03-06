@@ -1,13 +1,23 @@
 <template lang="html">
 <ul class="wrapper--row">
-  <li v-for="genre in genres">
-    <Genre
-      :genre="genre"
-      :seed_count="seed_count"
-      :seed_genres="seed_genres"
-      @toggle="toggleGenre($event.toggle, $event.seed)"
-    />
-  </li>
+  <template v-if="server_error">
+    <h3>
+      There is something wrong with the server. Wait a bit and then refresh the page.
+    </h3>
+    <p>
+      {{server_error}}
+    </p>
+  </template>
+  <template v-else>
+    <li v-for="genre in genres">
+      <Genre
+        :genre="genre"
+        :seed_count="seed_count"
+        :seed_genres="seed_genres"
+        @toggle="toggleGenre($event.toggle, $event.seed)"
+      />
+    </li>
+  </template>
 </ul>
 </template>
 
@@ -46,9 +56,11 @@ export default {
     getGenres: function() {
       axios.get('http://localhost:3000/genres')
       .then(response => {
+        this.server_error = null
         this.genres = response.data.genres
       })
       .catch(error => {
+        this.server_error = error
         console.log(error)
       })
     },
@@ -56,6 +68,7 @@ export default {
   data() {
     return {
       genres: [],
+      server_error: null,
     }
   }
 }

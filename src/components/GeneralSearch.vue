@@ -9,10 +9,10 @@
   </p>
   <template v-else-if="server_error">
     <h3>
-      There is something wrong with the server. Wait a bit and try the search again.
+      There is something wrong with the server. Wait a bit and then try the search again.
     </h3>
     <p>
-      {{error}}
+      {{server_error}}
     </p>
   </template>
   <template v-else>
@@ -90,15 +90,13 @@ export default {
         }
       })
       .then(response => {
-        this.error = null
-        this.server_error = false
+        this.server_error = null
         this.$store.commit('updateSongResults', response.data.tracks.items)
         this.$store.commit('updateArtistResults', response.data.artists.items)
         this.no_results = !response.data.tracks.items.length && !response.data.artists.items.length
       })
       .catch(error => {
-        this.error = error
-        this.server_error = true
+        this.server_error = error
         console.log(error)
       })
     },
@@ -114,8 +112,7 @@ export default {
     return {
       query: "",
       no_results: false,
-      server_error: false,
-      error: null
+      server_error: null
     }
   },
 }
