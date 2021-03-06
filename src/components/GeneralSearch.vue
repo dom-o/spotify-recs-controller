@@ -7,24 +7,35 @@
   <p v-if="no_results">
     There are no results for "{{display_query}}". Try searching something else?
   </p>
-  <ul v-else class="wrapper--col">
-    <li v-for="artist in this.artist_results" :key="artist.id">
-      <Artist
-        :artist="artist"
-        :seed_count="seed_count"
-        :seed_artists="seed_artists"
-        @toggle="toggleSeed($event.seed, $event.type, $event.toggle)"
-      />
-    </li>
-    <li v-for="song in this.song_results" :key="song.id">
-      <Song
-        :song="song"
-        :seed_count="seed_count"
-        :seed_songs="seed_songs"
-        @toggle="toggleSeed($event.seed, $event.type, $event.toggle)"
-      />
-    </li>
-  </ul>
+  <template v-else-if="server_error">
+    <h3>
+      There is something wrong with the server. Wait a bit and try the search again.
+    </h3>
+    <p>
+      {{error}}
+    </p>
+  </template>
+  <template v-else>
+    <h3 v-if="display_query">Results for "{{display_query}}":</h3>
+    <ul class="wrapper--col">
+      <li v-for="artist in this.artist_results" :key="artist.id">
+        <Artist
+          :artist="artist"
+          :seed_count="seed_count"
+          :seed_artists="seed_artists"
+          @toggle="toggleSeed($event.seed, $event.type, $event.toggle)"
+        />
+      </li>
+      <li v-for="song in this.song_results" :key="song.id">
+        <Song
+          :song="song"
+          :seed_count="seed_count"
+          :seed_songs="seed_songs"
+          @toggle="toggleSeed($event.seed, $event.type, $event.toggle)"
+        />
+      </li>
+    </ul>
+  </template>
 </div>
 </template>
 
@@ -64,6 +75,7 @@ export default {
       seed_artists: state => state.seed_artists,
       song_results: state => state.song_results,
       artist_results: state => state.artist_results,
+      display_query: state => state.saved_query
     }),
     ...mapGetters([
       'seed_count'
@@ -71,19 +83,22 @@ export default {
   },
   methods: {
     processForm: function() {
-      const query= this.query
+      this.$store.commit('updateSavedQuery', this.query)
       axios.get('http://localhost:3000/search', {
         params:{
-          query: query
+          query: this.query
         }
       })
       .then(response => {
+        this.error = null
+        this.server_error = false
         this.$store.commit('updateSongResults', response.data.tracks.items)
         this.$store.commit('updateArtistResults', response.data.artists.items)
         this.no_results = !response.data.tracks.items.length && !response.data.artists.items.length
-        this.display_query = this.query
       })
       .catch(error => {
+        this.error = error
+        this.server_error = true
         console.log(error)
       })
     },
@@ -98,8 +113,9 @@ export default {
   data() {
     return {
       query: "",
-      display_query: "",
       no_results: false,
+      server_error: false,
+      error: null
     }
   },
 }

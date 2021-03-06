@@ -7,6 +7,7 @@ Vue.use(Vuex)
 const getDefaultState = () => {
   return {
     seed_params_changed: false,
+    saved_query: "",
     seed_songs: [],
     seed_genres: [],
     seed_artists: [],
@@ -106,6 +107,9 @@ export default new Vuex.Store({
   plugins: [persistDataPlugin],
   state: getDefaultState(),
   mutations: {
+    updateSavedQuery(state, query) {
+      state.saved_query =  query
+    },
     setSeedParamsChanged(state, value) {
       state.seed_params_changed = Boolean(value)
     },
@@ -173,6 +177,9 @@ export default new Vuex.Store({
     updateSongRecs(state, data) {
       state.song_recs = data
       state.seed_params_changed = false
+    },
+    setSongRecs(state, data) {
+      state.song_recs = data
     },
     setSeedSongs(state, seeds) {
       state.seed_songs = seeds

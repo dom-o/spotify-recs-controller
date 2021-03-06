@@ -2,25 +2,31 @@ const persistInterval = 1000 * 60 * 60 * 24
 
 const plugin = store => {
   store.subscribe((mutation, state) => {
+    if(mutation.type === "updateSavedQuery") {
+      try {
+        localStorage.setItem('saved_query', JSON.stringify(state.saved_query))
+      } catch(error) { console.log(error) }
+    }
     if(mutation.type=== 'updateSongRecs') {
       try {
         localStorage.setItem('song_recs', JSON.stringify(state.song_recs))
-      } catch(error) {}
+        localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
+      } catch(error) { console.log(error) }
     } else if(mutation.type === 'addSong' || mutation.type === 'removeSong') {
       try {
         localStorage.setItem('seed_songs', JSON.stringify(state.seed_songs))
         localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
-      } catch(error) {}
+      } catch(error) { console.log(error) }
     } else if(mutation.type === 'addArtist' || mutation.type === 'removeArtist') {
       try {
         localStorage.setItem('seed_artists', JSON.stringify(state.seed_artists))
         localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
-      } catch(error) {}
+      } catch(error) { console.log(error) }
     } else if(mutation.type === 'addGenre' || mutation.type === 'removeGenre') {
       try {
         localStorage.setItem('seed_genres', JSON.stringify(state.seed_genres))
         localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
-      } catch(error) {}
+      } catch(error) { console.log(error) }
     } else if(mutation.type === 'toggleAudioFeature' ||
       mutation.type === 'changeCompareOption' ||
       mutation.type === 'changeFeatureNumber' ||
@@ -31,19 +37,21 @@ const plugin = store => {
         localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
       } catch (error) {}
     } else if(mutation.type === 'retrieveState') {
-      retrieveStorage('song_recs', 'updateSongRecs', store)
+      retrieveStorage('song_recs', 'setSongRecs', store)
       retrieveStorage('audio_features', 'setAudioFeatures', store)
       retrieveStorage('seed_artists', 'setSeedArtists', store)
       retrieveStorage('seed_genres', 'setSeedGenres', store)
       retrieveStorage('seed_songs', 'setSeedSongs', store)
       retrieveStorage('seed_params_changed', 'setSeedParamsChanged', store)
+      retrieveStorage('saved_query', 'updateSavedQuery', store)
     } else if (mutation.type === 'resetSearchState') {
-      localStorage.removeItem('song_recs')
-      localStorage.removeItem('audio_features')
-      localStorage.removeItem('seed_artists')
-      localStorage.removeItem('seed_genres')
-      localStorage.removeItem('seed_songs')
-      localStorage.removeItem('seed_params_changed')
+      // localStorage.removeItem('song_recs')
+      // localStorage.removeItem('audio_features')
+      // localStorage.removeItem('seed_artists')
+      // localStorage.removeItem('seed_genres')
+      // localStorage.removeItem('seed_songs')
+      // localStorage.removeItem('seed_params_changed')
+      localStorage.clear()
     } else if(mutation.type === 'clearStorage') {
       localStorage.clear()
     }
@@ -56,14 +64,14 @@ function retrieveStorage(item_name, mutation, store, timestamp_name=null) {
     storage = localStorage.getItem(item_name)
 
     if(storage) { storage = JSON.parse(storage) }
-  } catch(error) {}
+  } catch(error) { console.log(error) }
 
   if(timestamp_name) {
     try {
       timestamp = localStorage.getItem(timestamp_name)
       if (timestamp) { timestamp = JSON.parse(timestamp)
       }
-    } catch(error) {}
+    } catch(error) { console.log(error) }
   }
 
   if (storage) {
