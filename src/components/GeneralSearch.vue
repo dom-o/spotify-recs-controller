@@ -8,15 +8,15 @@
     There are no results for "{{display_query}}". Try searching something else?
   </p>
   <template v-else-if="server_error">
-    <h3>
+    <p>
       There is something wrong with the server. Wait a bit and then try the search again.
-    </h3>
+    </p>
     <p>
       {{server_error}}
     </p>
   </template>
   <template v-else>
-    <h3 v-if="display_query">Results for "{{display_query}}":</h3>
+    <h3 v-if="display_query && (artist_results.length || song_results.length)">Results for '{{display_query}}':</h3>
     <ul class="wrapper--col">
       <li v-for="artist in this.artist_results" :key="artist.id">
         <Artist

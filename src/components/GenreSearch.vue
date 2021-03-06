@@ -1,9 +1,9 @@
 <template lang="html">
 <ul class="wrapper--row">
   <template v-if="server_error">
-    <h3>
+    <p>
       There is something wrong with the server. Wait a bit and then refresh the page.
-    </h3>
+    </p>
     <p>
       {{server_error}}
     </p>

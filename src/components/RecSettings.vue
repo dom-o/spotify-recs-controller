@@ -60,6 +60,7 @@
 
     <p>{{ feature.description }}</p>
 
+    <!-- //style this better -->
     <table>
       <thead>
         <tr>
@@ -155,6 +156,7 @@ export default {
         this.song_details = response.data.audio_features
       })
       .catch(error => {
+        song_details = []
         console.log(error)
       })
     }
