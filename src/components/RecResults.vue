@@ -7,12 +7,24 @@
 </nav>
 <SeedList />
 <h1>New tracks</h1>
-<ul v-if="seed_count>0">
-  <button v-on:click="getRecData">reload recommendations</button>
-  <li v-for="track in this.track_recs" :key="track.id">
-    <SongDisplay :song="track" />
-  </li>
-</ul>
+<template v-if="seed_count>0">
+  <template v-if="server_error">
+    <label>
+      <p>There is something wrong with the server. Wait a bit and then click this button.</p>
+      <button v-on:click="getRecData">reload recommendations</button>
+    </label>
+    <p>
+      {{server_error}}
+    </p>
+  </template>
+  <ul v-else-if="track_recs.length>0">
+    <button v-on:click="getRecData">reload recommendations</button>
+    <li v-for="track in this.track_recs" :key="track.id">
+      <SongDisplay :song="track" />
+    </li>
+  </ul>
+  <p v-else>Unfortunately Spotify couldn't recommend anything based on your parameters. You could <router-link to="/recsettings">change</router-link> them, or <label>ask Spotify to try again. <button v-on:click="getRecData">reload recommendations</button></label></p>
+</template>
 <p v-else>This recommends you new music based on music you like already. <router-link to="/search">Pick some music you like first</router-link>.</p>
 </div>
 </template>
@@ -53,8 +65,7 @@ export default {
   },
   created() {
     this.$store.commit('retrieveState')
-    console.log(this.seed_params_changed)
-    if((this.seed_count && this.track_recs.length === 0) || (this.seed_params_changed)) {
+    if((this.seed_count>0 && this.track_recs.length === 0) || (this.seed_params_changed)) {
       this.getRecData()
     }
   },
@@ -85,16 +96,20 @@ export default {
 
       axios.get('http://localhost:3000/rec', { params: params })
       .then(response => {
+        this.server_error = null
         this.track_results = response.data.tracks
         this.$store.commit('updateSongRecs', response.data.tracks)
       })
       .catch(error => {
+        this.server_error = error
         console.log(error)
       })
     }
   },
   data () {
-    return {}
+    return {
+      server_error: null
+    }
   }
 }
 </script>
