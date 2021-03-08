@@ -1,24 +1,26 @@
 <template lang="html">
-<ul class="wrapper--row">
+<div>
   <template v-if="server_error">
     <p>
-      There is something wrong with the server. Wait a bit and then refresh the page.
+      Something went wrong getting the list of genres from the server. Wait a bit and then refresh the page.
     </p>
     <p>
       {{server_error}}
     </p>
   </template>
   <template v-else>
-    <li v-for="genre in genres">
-      <Genre
-        :genre="genre"
-        :seed_count="seed_count"
-        :seed_genres="seed_genres"
-        @toggle="toggleGenre($event.toggle, $event.seed)"
-      />
-    </li>
+    <ul class="wrapper--row">
+      <li v-for="genre in genres">
+        <Genre
+          :genre="genre"
+          :seed_count="seed_count"
+          :seed_genres="seed_genres"
+          @toggle="toggleGenre($event.toggle, $event.seed)"
+        />
+      </li>
+    </ul>
   </template>
-</ul>
+</div>
 </template>
 
 <style lang="css" scoped>

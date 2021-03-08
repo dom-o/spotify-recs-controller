@@ -4,17 +4,19 @@
   <h4><router-link to="/results">back to tracks</router-link></h4>
   <h4><router-link to="/search?new=true">start a new search</router-link></h4>
 </nav>
-<div style="clear: both;" v-if="song_recs.length>0&&seed_count>0">
+<h1>Save to playlist</h1>
+<div v-if="song_recs.length>0&&seed_count>0">
   <template v-if="!loggedIn">
     <a href="http://localhost:3000/login">Log in</a> to Spotify.
   </template>
   <template v-else>
-    <button @click="logOut">Log out</button>
+    <button style="float:right;"@click="logOut">log out of Spotify</button>
     <form @submit.prevent="processForm">
       <label>Name your playlist:
       <input v-model="playlist_name" required type="text"></label>
-      <input type="submit" value="create playlist">
+      <input style="display:block; margin-top:1rem;" type="submit" value="create playlist">
     </form>
+
     <p v-if="playlist_success">Playlist "{{this.created_playlist}}" was created. <a :href="this.playlist_url">Listen</a> to it!</p>
     <template v-else-if="playlist_failure">
       <p>
@@ -26,7 +28,7 @@
     </template>
   </template>
 </div>
-<p style="clear: both;" v-else>There's no songs to add to this playlist. <router-link to="/search">Add some first</router-link>.</p>
+<p v-else>There's no songs to add to this playlist. <router-link to="/search">Add some first</router-link>.</p>
 </div>
 </template>
 

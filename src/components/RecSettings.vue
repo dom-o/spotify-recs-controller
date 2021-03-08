@@ -96,9 +96,12 @@
 table {
   border-collapse: collapse;
 }
-th,td {
+th {
+  border-bottom: solid #fff;
+}
+td, th {
+  padding: 0rem 0.5rem;
   text-align: center;
-  border: 1px solid #fff;
 }
 </style>
 

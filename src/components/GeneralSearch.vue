@@ -9,7 +9,7 @@
   </p>
   <template v-else-if="server_error">
     <p>
-      There is something wrong with the server. Wait a bit and then try the search again.
+      Something went wrong getting search results from the server. Wait a bit and then try the search again.
     </p>
     <p>
       {{server_error}}

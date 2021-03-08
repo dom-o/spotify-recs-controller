@@ -8,22 +8,17 @@
 <SeedList />
 <h1>New tracks</h1>
 <template v-if="seed_count>0">
+  <button style="margin-bottom: 1rem;" v-on:click="getRecData">reload recommendations</button>
   <template v-if="server_error">
-    <label>
-      <p>There is something wrong with the server. Wait a bit and then click this button.</p>
-      <button v-on:click="getRecData">reload recommendations</button>
-    </label>
-    <p>
-      {{server_error}}
-    </p>
+    <p>There is something wrong with the server. Wait a bit and then click the button above.</p>
+    <p> {{server_error}} </p>
   </template>
   <ul v-else-if="track_recs.length>0">
-    <button v-on:click="getRecData">reload recommendations</button>
     <li v-for="track in this.track_recs" :key="track.id">
       <SongDisplay :song="track" />
     </li>
   </ul>
-  <p v-else>Unfortunately Spotify couldn't recommend anything based on your parameters. You could <router-link to="/recsettings">change</router-link> them, or <label>ask Spotify to try again. <button v-on:click="getRecData">reload recommendations</button></label></p>
+  <p v-else>Unfortunately Spotify couldn't recommend anything based on your parameters. You could <router-link to="/recsettings">change</router-link> them, or click the button above to get Spotify to try again.</p>
 </template>
 <p v-else>This recommends you new music based on music you like already. <router-link to="/search">Pick some music you like first</router-link>.</p>
 </div>
