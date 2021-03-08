@@ -6,10 +6,8 @@
 </nav>
 <div style="clear: both;" v-if="song_recs.length>0">
   <template v-if="!loggedIn">
-    First, <a href="http://localhost:3000/login">log in</a> to Spotify.
+    <a href="http://localhost:3000/login">Log in</a> to Spotify.
   </template>
-
-  <!-- also don't show this until you ARE logged in -->
   <template v-else>
     <button @click="logOut">Log out</button>
     <form @submit.prevent="processForm">
@@ -18,9 +16,14 @@
       <input type="submit" value="create playlist">
     </form>
     <p v-if="playlist_success">Playlist "{{this.created_playlist}}" was created. <a :href="this.playlist_url">Listen</a> to it!</p>
-
-    <!-- expound upon this error message -->
-    <p v-if="playlist_failure">Error creating playlist.</p>
+    <template v-else-if="playlist_failure">
+      <p>
+        There was a server error. Check your Spotify account, and see if the playlist is there and in what state; sometimes it gets created but adding the songs fails. If you want to try again, wait a bit and then click 'create playlist' again.
+      </p>
+      <p>
+        {{ playlist_failure }}
+      </p>
+    </template>
   </template>
 </div>
 <p style="clear: both;" v-else>There's no songs to add to this playlist. <router-link to="/search">Add some first</router-link>.</p>
@@ -60,12 +63,10 @@ export default {
       })
     },
     logOut: function() {
-      //tell the server to flush user data
       this.loggedIn = false
       axios.post('http://localhost:3000/logout')
       .then(response => {
         console.log(response)
-        //indicate success
       }).catch(error => {
         console.log(error)
       })
@@ -77,12 +78,15 @@ export default {
           playlist_name: this.playlist_name
         }
       }).then(response => {
+        this.playlist_failure = null
         this.playlist_url = response.data.playlist_url
         this.created_playlist = response.data.playlist_name
         this.playlist_success = true
+
       }).catch(error => {
         console.log(error)
-        this.playlist_failure = true
+        this.playlist_failure = error
+        this.playlist_success = false
       })
     },
     getSongIds: function () {
@@ -96,7 +100,7 @@ export default {
       created_playlist: "",
       playlist_url: "",
       playlist_success: false,
-      playlist_failure: false,
+      playlist_failure: null,
     }
   }
 }
