@@ -80,3 +80,8 @@ input:disabled, select:disabled, textarea:disabled {
   white-space: nowrap;
   padding: 0.25rem 0.25rem;
 }
+.nav__container {
+  width:100%;
+  display: inline-flex;
+  justify-content: space-between;
+}

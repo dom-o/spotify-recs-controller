@@ -1,10 +1,10 @@
 <template lang="html">
 <div>
-<nav>
-  <h4 class="nav__link--backward"><router-link to="/results">back</router-link></h4>
-  <h4 class="nav__link--forward"><router-link to="/search?new=true">new search</router-link></h4>
+<nav class="nav__container">
+  <h4><router-link to="/results">back to tracks</router-link></h4>
+  <h4><router-link to="/search?new=true">start a new search</router-link></h4>
 </nav>
-<div style="clear: both;" v-if="song_recs.length>0">
+<div style="clear: both;" v-if="song_recs.length>0&&seed_count>0">
   <template v-if="!loggedIn">
     <a href="http://localhost:3000/login">Log in</a> to Spotify.
   </template>
@@ -36,7 +36,7 @@
 <script>
 import axios from 'axios'
 import axiosRetry from 'axios-retry'
-import { mapState } from 'vuex'
+import { mapState, mapGetters } from 'vuex'
 
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
 
@@ -48,6 +48,9 @@ export default {
       access_token: state => state.access_token,
       refresh_token: state => state.refresh_token
     }),
+    ...mapGetters([
+      'seed_count',
+    ])
   },
   created() {
     this.$store.commit('retrieveState')
