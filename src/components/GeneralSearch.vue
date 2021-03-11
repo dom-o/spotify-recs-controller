@@ -1,7 +1,7 @@
 <template lang="html">
 <div>
   <form @submit.prevent="processForm" class="search__form">
-    <input v-model="query" type="text" class="search__input">
+    <input v-model="query" type="text" required class="search__input">
     <input type="submit" value="search" class="search__button--submit">
   </form>
   <p v-if="no_results">
