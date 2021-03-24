@@ -57,13 +57,21 @@ header {
 a {
   font-weight: bold;
   text-decoration: none;
+}
+a:link {
   color: #0095F8;
   border-bottom: .1em solid;
   background-color: #222;
 }
+a:visited {
+  color: #8383FF;
+}
 a:hover, a:active {
   color: #222;
   background-color: #0095F8;
+}
+a:visited:hover, a:visited:active {
+  background-color: #8383FF;
 }
 ul, ol, dd {
   margin:0;
