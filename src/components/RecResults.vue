@@ -8,17 +8,20 @@
 <SeedList />
 <h1>New tracks</h1>
 <template v-if="seed_count>0">
-  <button style="margin-bottom: 1rem;" v-on:click="getRecData">reload recommendations</button>
-  <template v-if="server_error">
-    <p>There is something wrong with the server. Wait a bit and then click the button above.</p>
-    <p> {{server_error}} </p>
+  <button style="margin-bottom: 1rem;" v-on:click="clickFunction">reload recommendations</button>
+  <p v-if="loading">..loading tracks</p>
+  <template v-else>
+    <template v-if="server_error">
+      <p>There is something wrong with the server. Wait a bit and then click the button above.</p>
+      <p> {{server_error}} </p>
+    </template>
+    <ul v-else-if="track_recs.length>0">
+      <li v-for="track in this.track_recs" :key="track.id">
+        <SongDisplay :song="track" />
+      </li>
+    </ul>
+    <p v-else-if="track_recs.length==0">Unfortunately Spotify couldn't recommend anything based on your parameters. You could <router-link to="/recsettings">change</router-link> them, or click the button above to get Spotify to try again.</p>
   </template>
-  <ul v-else-if="track_recs.length>0">
-    <li v-for="track in this.track_recs" :key="track.id">
-      <SongDisplay :song="track" />
-    </li>
-  </ul>
-  <p v-else>Unfortunately Spotify couldn't recommend anything based on your parameters. You could <router-link to="/recsettings">change</router-link> them, or click the button above to get Spotify to try again.</p>
 </template>
 <p v-else>This recommends you new music based on music you like already. <router-link to="/search">Pick some music you like first</router-link>.</p>
 </div>
@@ -61,10 +64,15 @@ export default {
   created() {
     this.$store.commit('retrieveState')
     if((this.seed_count>0 && this.track_recs.length === 0) || (this.seed_params_changed)) {
+      this.loading= true
       this.getRecData()
     }
   },
   methods: {
+    clickFunction() {
+      this.loading= true
+      this.getRecData()
+    },
     getRecData: function() {
       const params = {
         seed_tracks: this.seed_songs.map(seed => seed.id),
@@ -92,18 +100,20 @@ export default {
       axios.get('http://localhost:3000/rec', { params: params })
       .then(response => {
         this.server_error = null
-        this.track_results = response.data.tracks
         this.$store.commit('updateSongRecs', response.data.tracks)
+        this.loading = false
       })
       .catch(error => {
         this.server_error = error
         console.log(error)
+        this.loading = false
       })
     }
   },
   data () {
     return {
-      server_error: null
+      server_error: null,
+      loading: false,
     }
   }
 }
