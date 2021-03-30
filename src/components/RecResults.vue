@@ -97,7 +97,7 @@ export default {
         }
       }
 
-      axios.get('http://localhost:3000/rec', { params: params })
+      axios.get(process.env.VUE_APP_SERVER_NAME+'/rec', { params: params })
       .then(response => {
         this.server_error = null
         this.$store.commit('updateSongRecs', response.data.tracks)

@@ -56,7 +56,7 @@ export default {
       checked ? this.$store.commit('addGenre', genre) : this.$store.commit('removeGenre',genre)
     },
     getGenres: function() {
-      axios.get('http://localhost:3000/genres')
+      axios.get(process.env.VUE_APP_SERVER_NAME+'/genres')
       .then(response => {
         this.server_error = null
         this.genres = response.data.genres

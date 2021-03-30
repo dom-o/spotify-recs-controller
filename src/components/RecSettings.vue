@@ -149,7 +149,7 @@ export default {
       return (this.song_details.find(element => {return element.id===id}))
     },
     getSeedData: function() {
-      axios.get('http://localhost:3000/info', {
+      axios.get(process.env.VUE_APP_SERVER_NAME+'/info', {
         params: {
           tracks: this.seed_songs.map(seed => seed.id),
         }

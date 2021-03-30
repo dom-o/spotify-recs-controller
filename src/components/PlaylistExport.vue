@@ -60,7 +60,7 @@ export default {
   },
   methods: {
     checkLoggedIn: function() {
-      axios.get('http://localhost:3000/isLoggedIn').then(response => {
+      axios.get(process.env.VUE_APP_SERVER_NAME+'/isLoggedIn').then(response => {
         this.loggedIn = response.data
       }).catch(error => {
         console.log(error)
@@ -69,7 +69,7 @@ export default {
     },
     logOut: function() {
       this.loggedIn = false
-      axios.post('http://localhost:3000/logout')
+      axios.post(process.env.VUE_APP_SERVER_NAME+'/logout')
       .then(response => {
         console.log(response)
       }).catch(error => {
@@ -77,7 +77,7 @@ export default {
       })
     },
     processForm: function () {
-      axios.get('http://localhost:3000/playlist', {
+      axios.get(process.env.VUE_APP_SERVER_NAME+'/playlist', {
         params: {
           uris: this.getSongIds(),
           playlist_name: this.playlist_name
