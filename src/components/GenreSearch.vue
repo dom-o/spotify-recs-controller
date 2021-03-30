@@ -10,7 +10,7 @@
   </template>
   <template v-else>
     <ul class="wrapper--row">
-      <li v-for="genre in genres">
+      <li v-for="genre in genres" :key="genre">
         <Genre
           :genre="genre"
           :seed_count="seed_count"

@@ -10,7 +10,7 @@
     <a href="http://localhost:3000/login">Log in</a> to Spotify.
   </template>
   <template v-else>
-    <button style="float:right;"@click="logOut">log out of Spotify</button>
+    <button style="float:right;" @click="logOut">log out of Spotify</button>
     <form @submit.prevent="processForm">
       <label>Name your playlist:
       <input v-model="playlist_name" required type="text"></label>

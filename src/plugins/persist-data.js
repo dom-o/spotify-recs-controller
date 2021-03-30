@@ -1,5 +1,3 @@
-const persistInterval = 1000 * 60 * 60 * 24
-
 const plugin = store => {
   store.subscribe((mutation, state) => {
     if(mutation.type === "updateSavedQuery") {
@@ -35,7 +33,7 @@ const plugin = store => {
       try {
         localStorage.setItem('audio_features', JSON.stringify(state.audio_features))
         localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
-      } catch (error) {}
+      } catch (error) { console.log(error) }
     } else if(mutation.type === 'retrieveState') {
       retrieveStorage('song_recs', 'setSongRecs', store)
       retrieveStorage('audio_features', 'setAudioFeatures', store)
@@ -44,15 +42,7 @@ const plugin = store => {
       retrieveStorage('seed_songs', 'setSeedSongs', store)
       retrieveStorage('seed_params_changed', 'setSeedParamsChanged', store)
       retrieveStorage('saved_query', 'updateSavedQuery', store)
-    } else if (mutation.type === 'resetSearchState') {
-      // localStorage.removeItem('song_recs')
-      // localStorage.removeItem('audio_features')
-      // localStorage.removeItem('seed_artists')
-      // localStorage.removeItem('seed_genres')
-      // localStorage.removeItem('seed_songs')
-      // localStorage.removeItem('seed_params_changed')
-      localStorage.clear()
-    } else if(mutation.type === 'clearStorage') {
+    } else if (mutation.type === 'resetState') {
       localStorage.clear()
     }
   })

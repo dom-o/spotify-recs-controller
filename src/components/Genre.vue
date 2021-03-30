@@ -33,13 +33,11 @@
 
 <script>
 import BaseCheckbox from './BaseCheckbox.vue'
-import Thumbnail from './Thumbnail.vue'
 
 export default {
   name: 'Genre',
   components: {
     BaseCheckbox,
-    Thumbnail,
   },
   props: {
     genre: String,

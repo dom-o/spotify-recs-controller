@@ -193,11 +193,7 @@ export default new Vuex.Store({
     setAudioFeatures(state, features) {
       state.audio_features = features
     },
-    retrieveState(state) {},
-    clearStorage(state) {},
-    resetSearchState(state) {
-      Object.assign(state, getDefaultState())
-    },
+    retrieveState() {},
     resetState(state) {
       Object.assign(state, getDefaultState())
     }

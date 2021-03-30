@@ -10,7 +10,7 @@
   Here you can fine-tune the recommendations you'll get. If you set instrumentalness to less than 0.35, for example, you probably won't be recommended any instrumental tracks. You could also set valence high if you want more cheery tracks.
 </p>
 <form v-if="seed_count>0" @submit.prevent="processForm">
-  <div v-for="feature in audio_features" class="wrapper--col">
+  <div v-for="feature in audio_features" :key="feature.name" class="wrapper--col">
     <label :for="feature.name">
       <h2>
         <input type="checkbox"
@@ -60,16 +60,15 @@
 
     <p>{{ feature.description }}</p>
 
-    <!-- //style this better -->
     <table>
       <thead>
         <tr>
-          <th v-for="song in seed_songs">{{song.name}}</th>
+          <th v-for="song in seed_songs" :key="song.name">{{song.name}}</th>
         </tr>
       </thead>
       <tbody>
         <tr>
-          <td v-for="song in seed_songs">
+          <td v-for="song in seed_songs" :key="song.name">
             <template v-if="song_details.length">
               {{ getFeatureValue(song, feature, song_details) }}
             </template>
@@ -159,7 +158,7 @@ export default {
         this.song_details = response.data.audio_features
       })
       .catch(error => {
-        song_details = []
+        this.song_details = []
         console.log(error)
       })
     }
