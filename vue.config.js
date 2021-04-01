@@ -1,5 +1,3 @@
 module.exports ={
-  publicPath: process.env.NODE_ENV === 'production'
-    ? '/spotify-recs-controller'
-    : '/'
+  publicPath: process.env.VUE_APP_BASE_DIR
 }
