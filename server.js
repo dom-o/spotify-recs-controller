@@ -85,7 +85,7 @@ app.post('/logout', function(req, res) {
   res.status(200).send('Logged out successfully.')
 })
 
-app.get('/isLoggedIn', function(req, res) {
+app.get('/isLoggedIn', function(req, res, next) {
   debug('/isLoggedIn')
   if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
     res.status(200).send(false)
@@ -96,9 +96,7 @@ app.get('/isLoggedIn', function(req, res) {
       }
     }).then(response => {
       res.status(200).send(true)
-    }).catch(error => {
-      res.send(false)
-    })
+    }).catch(next)
   }
 })
 

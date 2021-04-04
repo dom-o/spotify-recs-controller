@@ -7,6 +7,14 @@
 <h1>Save to playlist</h1>
 <div v-if="song_recs.length>0&&seed_count>0">
   <template v-if="!loggedIn">
+    <template v-if="login_error">
+      <p>
+        There was a server error while logging in. Wait a bit and then try to log in again.
+      </p>
+      <p>
+        {{ login_error }}
+      </p>
+    </template>
     <a href="http://localhost:3000/login">Log in</a> to Spotify.
   </template>
   <template v-else>
@@ -62,9 +70,11 @@ export default {
     checkLoggedIn: function() {
       axios.get(process.env.VUE_APP_SERVER_NAME+'/isLoggedIn').then(response => {
         this.loggedIn = response.data
+        this.login_error = null
       }).catch(error => {
         console.log(error)
         this.loggedIn = false
+        this.login_error = error
       })
     },
     logOut: function() {
@@ -101,6 +111,7 @@ export default {
   data() {
     return {
       loggedIn: false,
+      login_error: null,
       playlist_name: "",
       created_playlist: "",
       playlist_url: "",
