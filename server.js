@@ -1,4 +1,7 @@
-require('dotenv').config()
+require('dotenv').config({
+  path: '.env.local'
+})
+const debug = require('debug')('express:server')
 const express = require('express')
 const helmet = require('helmet')
 const axios = require('axios')
@@ -17,7 +20,7 @@ app.use(express.json())
    .use(helmet())
    .use(cookieParser())
    .use(cors({
-     origin: 'http://localhost:8080', //'domonicmilesi.com',
+     origin: process.env.CLIENT_ORIGIN,
      credentials: true,
      optionsSuccessStatus: 200,
    }))
@@ -35,7 +38,7 @@ axios.interceptors.request.use(req => {
 
 axios.interceptors.response.use(null, (error) =>{
   if(error.config && error.response && error.response.status === 401) {
-    console.log('401 error, interceptor')
+    debug('401 error, interceptor')
     if(process.env.USER_REFRESH_TOKEN) {
       return axios.post('https://accounts.spotify.com/api/token',
       'grant_type=refresh_token&refresh_token='+process.env.USER_REFRESH_TOKEN,
@@ -50,7 +53,7 @@ axios.interceptors.response.use(null, (error) =>{
         return axios.request(error.config)
       })
     } else {
-      console.log('no user token, refreshing general access token')
+      debug('no user token, refreshing general access token')
       return (axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
         headers: {
           'Authorization': 'Basic '+ encodedPayload,
@@ -83,7 +86,7 @@ app.post('/logout', function(req, res) {
 })
 
 app.get('/isLoggedIn', function(req, res) {
-  console.log('/isLoggedIn')
+  debug('/isLoggedIn')
   if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
     res.status(200).send(false)
   } else {
@@ -100,7 +103,7 @@ app.get('/isLoggedIn', function(req, res) {
 })
 
 app.get('/login', function(req, res) {
-  console.log('/login')
+  debug('/login')
   const state = randomString(16)
   res.cookie(stateKey, state)
   const scope = 'playlist-modify-public user-read-email' //user-library-modify if we want to let the user add the songs to their library individually, playlist-modify-private if we want to interact with private playlists (we might)
@@ -115,7 +118,7 @@ app.get('/login', function(req, res) {
 })
 
 app.get('/callback', function(req, res) {
-  console.log('/callback')
+  debug('/callback')
   let state = req.query.state
   let storedState = req.cookies ? req.cookies[stateKey] : null
 
@@ -143,16 +146,16 @@ app.get('/callback', function(req, res) {
       process.env.USER_REFRESH_TOKEN = response.data.refresh_token
       process.env.USER_DATA_TIMESTAMP = new Date().getTime() + persistInterval
 
-      res.redirect('http://localhost:8080/export')
+      res.redirect(process.env.CLIENT_ORIGIN+'/export')
     }).catch(error => {
-      console.log(error)
+      debug(error)
       res.send({error})
     })
   }
 })
 
 app.get('/search', function(req, res) {
-  console.log('/search')
+  debug('/search')
   if(req.query.query) {
     axios.get('/search', {
       baseURL: 'https://api.spotify.com/v1/',
@@ -167,7 +170,7 @@ app.get('/search', function(req, res) {
     })
     .then(response => { res.json(response.data) })
     .catch(error => {
-      console.log('error')
+      debug('error')
       res.send({error})
     })
   } else {
@@ -175,22 +178,19 @@ app.get('/search', function(req, res) {
   }
 })
 
-app.get('/genres', function(req, res) {
-  console.log('/genres')
+app.get('/genres', function(req, res, next) {
+  debug('/genres')
   axios.get('/recommendations/available-genre-seeds', {
     baseURL: 'https://api.spotify.com/v1/',
     headers: {
       'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
     },
   }).then(response => { res.json(response.data) })
-  .catch(error => {
-    console.log('error, genres')
-    res.send({error})
-  })
+  .catch(next)
 })
 
 app.get('/info', function(req, res) {
-  console.log('/info')
+  debug('/info')
   const methods = req.query.tracks
     ? [get_track_features(req.query.tracks.toString())]
     : []
@@ -204,16 +204,16 @@ app.get('/info', function(req, res) {
 
     res.json(converted)
   }).catch(error => {
-    console.log('error')
+    debug('error')
     res.send({error})
   })
 })
 
 app.get('/rec', function(req, res) {
-  console.log('/rec')
+  debug('/rec')
 
   if(req.query) {
-    console.log(req.query)
+    debug(req.query)
     for(let key in req.query) {
       req.query[key] = req.query[key].toString()
     }
@@ -226,7 +226,7 @@ app.get('/rec', function(req, res) {
       },
     }).then(response => { res.json(response.data) })
     .catch(error => {
-      console.log('error')
+      debug('error')
       res.send({error})
     })
   } else {
@@ -235,9 +235,9 @@ app.get('/rec', function(req, res) {
 })
 
 app.get('/playlist', function(req, res) {
-  console.log('/playlist')
+  debug('/playlist')
   if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
-    console.log('in /playlist, user tokens invalid')
+    debug('in /playlist, user tokens invalid')
     res.status(500).send('User not logged into Spotify.')
   }
   else if(req.query.uris) {
@@ -248,7 +248,7 @@ app.get('/playlist', function(req, res) {
         'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN
       }
     }).then(response => {
-      console.log('user data aquired, creating playlist now')
+      debug('user data aquired, creating playlist now')
       const user_id = response.data.id
       name = req.query.playlist_name ? req.query.playlist_name : 'recs-controller-export'
       return axios.post("https://api.spotify.com/v1/users/"+user_id+"/playlists", JSON.stringify({name: name}), {
@@ -258,7 +258,7 @@ app.get('/playlist', function(req, res) {
         },
       })
     }).then(response => {
-      console.log('playlist created, adding tracks now')
+      debug('playlist created, adding tracks now')
       const playlist_id = response.data.id
       playlist_url = response.data.external_urls.spotify
       return axios.post('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks', JSON.stringify({uris:req.query.uris}), {
@@ -268,10 +268,10 @@ app.get('/playlist', function(req, res) {
         },
       })
     }).then(response => {
-      console.log('tracks added, playlist success')
+      debug('tracks added, playlist success')
       res.json({playlist_url: playlist_url, playlist_name: name })
     }).catch(error => {
-      console.log(error)
+      debug(error)
       res.send(error)
     })
   } else {
@@ -279,7 +279,7 @@ app.get('/playlist', function(req, res) {
   }
 })
 
-app.listen(port, () => console.log(`Listening on port ${port}!`))
+app.listen(port, () => debug(`Listening on port ${port}!`))
 
 function get_track_features(ids) {
   return axios.get('/audio-features', {
