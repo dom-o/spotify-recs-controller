@@ -13,7 +13,7 @@ const app = express()
 const port = 3000
 const payload = process.env.CLIENT_ID+':'+process.env.CLIENT_SECRET
 const encodedPayload = new Buffer(payload).toString('base64')
-const redirect_uri = 'http://localhost:3000/callback'
+const redirect_uri = process.env.VUE_APP_SERVER_NAME+'/callback'
 const persistInterval = 1000 * 60 * 60 * 24 * 7
 
 app.use(express.json())
@@ -115,7 +115,7 @@ app.get('/login', function(req, res) {
   )
 })
 
-app.get('/callback', function(req, res) {
+app.get('/callback', function(req, res, next) {
   debug('/callback')
   let state = req.query.state
   let storedState = req.cookies ? req.cookies[stateKey] : null
@@ -145,14 +145,11 @@ app.get('/callback', function(req, res) {
       process.env.USER_DATA_TIMESTAMP = new Date().getTime() + persistInterval
 
       res.redirect(process.env.CLIENT_ORIGIN+'/export')
-    }).catch(error => {
-      debug(error)
-      res.send({error})
-    })
+    }).catch(next)
   }
 })
 
-app.get('/search', function(req, res) {
+app.get('/search', function(req, res, next) {
   debug('/search')
   if(req.query.query) {
     axios.get('/search', {
@@ -165,12 +162,8 @@ app.get('/search', function(req, res) {
       headers: {
         'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
       },
-    })
-    .then(response => { res.json(response.data) })
-    .catch(error => {
-      debug('error')
-      res.send({error})
-    })
+    }).then(response => { res.json(response.data) })
+    .catch(next)
   } else {
     res.status(400).send('No search query.')
   }
@@ -187,7 +180,7 @@ app.get('/genres', function(req, res, next) {
   .catch(next)
 })
 
-app.get('/info', function(req, res) {
+app.get('/info', function(req, res, next) {
   debug('/info')
   const methods = req.query.tracks
     ? [get_track_features(req.query.tracks.toString())]
@@ -201,13 +194,10 @@ app.get('/info', function(req, res) {
       .reduce((obj, item) => Object.assign(obj, item))
 
     res.json(converted)
-  }).catch(error => {
-    debug('error')
-    res.send({error})
-  })
+  }).catch(next)
 })
 
-app.get('/rec', function(req, res) {
+app.get('/rec', function(req, res, next) {
   debug('/rec')
 
   if(req.query) {
@@ -223,16 +213,13 @@ app.get('/rec', function(req, res) {
         'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
       },
     }).then(response => { res.json(response.data) })
-    .catch(error => {
-      debug('error')
-      res.send({error})
-    })
+    .catch(next)
   } else {
     res.status(400).send('No recommendation parameters.')
   }
 })
 
-app.get('/playlist', function(req, res) {
+app.get('/playlist', function(req, res, next) {
   debug('/playlist')
   if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
     debug('in /playlist, user tokens invalid')
@@ -268,10 +255,7 @@ app.get('/playlist', function(req, res) {
     }).then(response => {
       debug('tracks added, playlist success')
       res.json({playlist_url: playlist_url, playlist_name: name })
-    }).catch(error => {
-      debug(error)
-      res.send(error)
-    })
+    }).catch(next)
   } else {
     res.status(400).send('No tracks found to add to playlist.')
   }
