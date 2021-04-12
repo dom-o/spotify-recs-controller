@@ -9,6 +9,7 @@ import RecResults from './components/RecResults.vue'
 import GenreSearch from './components/GenreSearch.vue'
 import GeneralSearch from './components/GeneralSearch.vue'
 import PlaylistExport from './components/PlaylistExport.vue'
+import Callback from './components/Callback.vue'
 
 Vue.config.productionTip = false
 Vue.use(VueRouter)
@@ -29,7 +30,8 @@ const routes = [
   },
   { path: '/recsettings', name: 'Settings', component: RecSettings },
   { path: '/results', name: 'Results', component: RecResults },
-  { path: '/export', name: 'Export', component: PlaylistExport}
+  { path: '/export', name: 'Export', component: PlaylistExport },
+  { path: '/callback', name: 'Callback', component: Callback }
 ]
 
 const router = new VueRouter({

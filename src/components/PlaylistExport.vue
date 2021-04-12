@@ -6,16 +6,16 @@
 </nav>
 <h1>Save to playlist</h1>
 <div v-if="song_recs.length>0&&seed_count>0">
-  <template v-if="!loggedIn">
+  <template v-if="!logged_in">
     <template v-if="login_error">
       <p>
-        There was a server error while logging in. Wait a bit and then try to log in again.
+        There was an error while logging in. Wait a bit and then try to log in again.
       </p>
       <p>
         {{ login_error }}
       </p>
     </template>
-    <a href="http://localhost:3000/login">Log in</a> to Spotify.
+    <a :href="getLoginLink()">Log in</a> to Spotify.
   </template>
   <template v-else>
     <button style="float:right;" @click="logOut">log out of Spotify</button>
@@ -56,7 +56,8 @@ export default {
     ...mapState({
       song_recs: state => state.song_recs,
       access_token: state => state.access_token,
-      refresh_token: state => state.refresh_token
+      callback_state: state => state.callback_state,
+      login_error: state => state.login_error
     }),
     ...mapGetters([
       'seed_count',
@@ -67,37 +68,77 @@ export default {
     this.checkLoggedIn()
   },
   methods: {
+    randomString: function(len) {
+      let str = ''
+      let charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
+      for (var i=0; i<len; i++) {
+        str += charSet[Math.floor(Math.random() * charSet.length)]
+      }
+      return str
+    },
+    getLoginLink: function () {
+      const scope = 'playlist-modify-public user-read-email'
+      const state = this.randomString(16)
+      this.$store.commit('setCallbackState', state)
+      return "https://accounts.spotify.com/authorize" +
+      "?client_id="+ process.env.VUE_APP_SPOTIFY_CLIENT_ID +
+      "&response_type=token" +
+      "&redirect_uri=" + encodeURIComponent(process.env.VUE_APP_CLIENT_URL)+'/callback' +
+      "&scope=" + encodeURIComponent(scope) +
+      '&show_dialog=true' +
+      '&state=' + state
+    },
     checkLoggedIn: function() {
-      axios.get(process.env.VUE_APP_SERVER_NAME+'/isLoggedIn').then(response => {
-        this.loggedIn = response.data
-        this.login_error = null
-      }).catch(error => {
-        console.log(error)
-        this.loggedIn = false
-        this.login_error = error
-      })
+      if(this.access_token) {
+        axios.get(this.base_url+ '/me', {
+          headers: {
+            'Authorization': 'Bearer '+ this.access_token
+          }
+        }).then( () => {
+          this.logged_in = true
+        }).catch(error => {
+          console.log(error)
+          this.logged_in = false
+        })
+      } else {
+        this.logged_in = false
+      }
     },
     logOut: function() {
-      this.loggedIn = false
-      axios.post(process.env.VUE_APP_SERVER_NAME+'/logout')
-      .then(response => {
-        console.log(response)
-      }).catch(error => {
-        console.log(error)
-      })
+      this.logged_in = false
+      this.$store.commit('clearAccessToken')
     },
     processForm: function () {
-      axios.get(process.env.VUE_APP_SERVER_NAME+'/playlist', {
-        params: {
-          uris: this.getSongIds(),
-          playlist_name: this.playlist_name
+      const uris = this.song_recs.map(song => song.uri)
+      const name = this.playlist_name ? this.playlist_name : 'recs-controller-export'
+      axios.get(this.base_url+ '/me', {
+        headers: {
+          'Authorization': 'Bearer '+ this.access_token
         }
       }).then(response => {
+        console.log('user data aquired, creating playlist now')
+        const user_id = response.data.id
+        return axios.post(this.base_url+ '/users/'+user_id+'/playlists', JSON.stringify({name: name}), {
+          headers: {
+            'Authorization': 'Bearer '+ this.access_token,
+            'Content-Type': 'application/json',
+          },
+        })
+      }).then(response => {
+        console.log('playlist created, adding tracks now')
+        const playlist_id = response.data.id
+        this.playlist_url = response.data.external_urls.spotify
+        return axios.post(this.base_url+ '/playlists/'+playlist_id+'/tracks', JSON.stringify({uris:uris}), {
+          headers: {
+            'Authorization': 'Bearer '+ this.access_token,
+            'Content-Type': 'application/json',
+          },
+        })
+      }).then(response => {
+        console.log(response)
         this.playlist_failure = null
-        this.playlist_url = response.data.playlist_url
-        this.created_playlist = response.data.playlist_name
+        this.created_playlist = name
         this.playlist_success = true
-
       }).catch(error => {
         console.log(error)
         this.playlist_failure = error
@@ -110,8 +151,8 @@ export default {
   },
   data() {
     return {
-      loggedIn: false,
-      login_error: null,
+      base_url: 'https://api.spotify.com/v1',
+      logged_in: false,
       playlist_name: "",
       created_playlist: "",
       playlist_url: "",

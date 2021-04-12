@@ -34,6 +34,15 @@ const plugin = store => {
         localStorage.setItem('audio_features', JSON.stringify(state.audio_features))
         localStorage.setItem('seed_params_changed', JSON.stringify(state.seed_params_changed))
       } catch (error) { console.log(error) }
+    } else if(mutation.type === 'setCallbackState') {
+      try { localStorage.setItem('callback_state', JSON.stringify(state.callback_state)) }
+      catch(error) { console.log(error) }
+    } else if(mutation.type === 'setAccessToken') {
+      try { localStorage.setItem('access_token', JSON.stringify(state.access_token)) }
+      catch(error) { console.log(error) }
+    } else if(mutation.type === 'clearAccessToken') {
+      try { localStorage.removeItem('access_token') }
+      catch(error) { console.log(error) }
     } else if(mutation.type === 'retrieveState') {
       retrieveStorage('song_recs', 'setSongRecs', store)
       retrieveStorage('audio_features', 'setAudioFeatures', store)
@@ -42,6 +51,8 @@ const plugin = store => {
       retrieveStorage('seed_songs', 'setSeedSongs', store)
       retrieveStorage('seed_params_changed', 'setSeedParamsChanged', store)
       retrieveStorage('saved_query', 'updateSavedQuery', store)
+      retrieveStorage('callback_state', 'setCallbackState', store)
+      retrieveStorage('access_token', 'setAccessToken', store)
     } else if (mutation.type === 'resetState') {
       localStorage.clear()
     }

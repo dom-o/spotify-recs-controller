@@ -14,6 +14,9 @@ const getDefaultState = () => {
     song_results: [],
     artist_results: [],
     song_recs: [],
+    callback_state: '',
+    access_token: '',
+    login_error: null,
     audio_features: {
       acousticness: {
         name:'acousticness',
@@ -192,6 +195,18 @@ export default new Vuex.Store({
     },
     setAudioFeatures(state, features) {
       state.audio_features = features
+    },
+    setCallbackState(state, callback_state) {
+      state.callback_state = callback_state
+    },
+    setAccessToken(state, token) {
+      state.access_token = token
+    },
+    clearAccessToken(state) {
+      state.access_token = getDefaultState().access_token
+    },
+    setLoginError(state, error) {
+      state.login_error = error
     },
     retrieveState() {},
     resetState(state) {

@@ -84,7 +84,7 @@ export default {
   methods: {
     processForm: function() {
       this.$store.commit('updateSavedQuery', this.query)
-      axios.get(process.env.VUE_APP_SERVER_NAME+'/search', {
+      axios.get(process.env.VUE_APP_SERVER_URL+'/search', {
         params:{
           query: this.query
         }
