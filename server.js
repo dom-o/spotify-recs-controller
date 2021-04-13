@@ -11,142 +11,35 @@ const cookieParser = require('cookie-parser')
 // const { body } = require('express-validator')
 const app = express()
 const port = 3000
-const payload = process.env.CLIENT_ID+':'+process.env.CLIENT_SECRET
+const payload = process.env.VUE_APP_SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET
 const encodedPayload = new Buffer(payload).toString('base64')
-const redirect_uri = process.env.VUE_APP_SERVER_NAME+'/callback'
-const persistInterval = 1000 * 60 * 60 * 24 * 7
 
 app.use(express.json())
    .use(helmet())
    .use(cookieParser())
    .use(cors({
-     origin: process.env.CLIENT_ORIGIN,
+     origin: process.env.VUE_APP_CLIENT_URL,
      credentials: true,
      optionsSuccessStatus: 200,
    }))
 
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
-axios.interceptors.request.use(req => {
-  if(process.env.USER_REFRESH_TOKEN && process.env.USER_DATA_TIMESTAMP && new Date().getTime() < process.env.USER_DATA_TIMESTAMP) {
-    process.env.USER_DATA_TIMESTAMP = new Date().getTime() + persistInterval
-  } else {
-    delete process.env.USER_REFRESH_TOKEN
-    delete process.env.USER_ACCESS_TOKEN
-  }
-  return req
-})
 
 axios.interceptors.response.use(null, (error) =>{
   if(error.config && error.response && error.response.status === 401) {
-    debug('401 error, interceptor')
-    if(process.env.USER_REFRESH_TOKEN) {
-      return axios.post('https://accounts.spotify.com/api/token',
-      'grant_type=refresh_token&refresh_token='+process.env.USER_REFRESH_TOKEN,
-      {
-        headers: {
-          'Authorization': 'Basic '+ encodedPayload,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      }).then(response => {
-        process.env.USER_ACCESS_TOKEN = response.data.access_token
-        error.config.headers['Authorization'] = 'Bearer '+ process.env.USER_ACCESS_TOKEN
-        return axios.request(error.config)
-      })
-    } else {
-      debug('no user token, refreshing general access token')
-      return (axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
-        headers: {
-          'Authorization': 'Basic '+ encodedPayload,
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-      })).then(response => {
-        process.env.ACCESS_TOKEN = response.data.access_token
-        error.config.headers['Authorization'] = 'Bearer '+ process.env.ACCESS_TOKEN
-        return axios.request(error.config)
-      })
-    }
+    debug('401 error, interceptor, refreshing general access token')
+    return (axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
+      headers: {
+        'Authorization': 'Basic '+ encodedPayload,
+        'Content-Type': 'application/x-www-form-urlencoded',
+      },
+    })).then(response => {
+      process.env.ACCESS_TOKEN = response.data.access_token
+      error.config.headers['Authorization'] = 'Bearer '+ process.env.ACCESS_TOKEN
+      return axios.request(error.config)
+    })
   }
   return Promise.reject(error)
-})
-
-function randomString(len) {
-  let str = ''
-  let charSet = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz1234567890'
-  for (var i=0; i<len; i++) {
-    str += charSet[Math.floor(Math.random() * charSet.length)]
-  }
-  return str
-}
-const stateKey = 'spotify_auth_state'
-
-app.post('/logout', function(req, res) {
-  delete process.env.USER_REFRESH_TOKEN
-  delete process.env.USER_ACCESS_TOKEN
-  res.status(200).send('Logged out successfully.')
-})
-
-app.get('/isLoggedIn', function(req, res, next) {
-  debug('/isLoggedIn')
-  if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
-    res.status(200).send(false)
-  } else {
-    axios.get('https://api.spotify.com/v1/me', {
-      headers: {
-        'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN
-      }
-    }).then(response => {
-      res.status(200).send(true)
-    }).catch(next)
-  }
-})
-
-app.get('/login', function(req, res) {
-  debug('/login')
-  const state = randomString(16)
-  res.cookie(stateKey, state)
-  const scope = 'playlist-modify-public user-read-email' //user-library-modify if we want to let the user add the songs to their library individually, playlist-modify-private if we want to interact with private playlists (we might)
-  res.redirect('https://accounts.spotify.com/authorize' +
-    '?response_type=code' +
-    '&client_id=' + process.env.CLIENT_ID +
-    (scope ? '&scope=' + encodeURIComponent(scope) : '') +
-    '&redirect_uri=' + encodeURIComponent(redirect_uri) +
-    '&show_dialog=true' +
-    '&state=' + state
-  )
-})
-
-app.get('/callback', function(req, res, next) {
-  debug('/callback')
-  let state = req.query.state
-  let storedState = req.cookies ? req.cookies[stateKey] : null
-
-  if(state === null || state !== storedState) {
-    //ERROR
-    res.status(500).send('State mismatch')
-  } else {
-    res.clearCookie(stateKey)
-    const params = {
-      grant_type: 'authorization_code',
-      code: req.query.code,
-      redirect_uri: redirect_uri,
-    }
-    const urlParams = Object.entries(params)
-      .map(([key, val]) => `${encodeURIComponent(key)}=${encodeURIComponent(val)}`)
-      .join('&')
-
-    axios.post('https://accounts.spotify.com/api/token', urlParams, {
-      headers: {
-        'Authorization': 'Basic ' + encodedPayload,
-        "Content-Type": "application/x-www-form-urlencoded",
-      },
-    }).then(response => {
-      process.env.USER_ACCESS_TOKEN = response.data.access_token
-      process.env.USER_REFRESH_TOKEN = response.data.refresh_token
-      process.env.USER_DATA_TIMESTAMP = new Date().getTime() + persistInterval
-
-      res.redirect(process.env.CLIENT_ORIGIN+'/export')
-    }).catch(next)
-  }
 })
 
 app.get('/search', function(req, res, next) {
@@ -160,7 +53,7 @@ app.get('/search', function(req, res, next) {
         limit: 6,
       },
       headers: {
-        'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
+        'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
       },
     }).then(response => { res.json(response.data) })
     .catch(next)
@@ -174,7 +67,7 @@ app.get('/genres', function(req, res, next) {
   axios.get('/recommendations/available-genre-seeds', {
     baseURL: 'https://api.spotify.com/v1/',
     headers: {
-      'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
+      'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
     },
   }).then(response => { res.json(response.data) })
   .catch(next)
@@ -210,54 +103,12 @@ app.get('/rec', function(req, res, next) {
       baseURL: 'https://api.spotify.com/v1/',
       params: req.query,
       headers: {
-        'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
+        'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
       },
     }).then(response => { res.json(response.data) })
     .catch(next)
   } else {
     res.status(400).send('No recommendation parameters.')
-  }
-})
-
-app.get('/playlist', function(req, res, next) {
-  debug('/playlist')
-  if(!(process.env.USER_REFRESH_TOKEN && process.env.USER_ACCESS_TOKEN)) {
-    debug('in /playlist, user tokens invalid')
-    res.status(500).send('User not logged into Spotify.')
-  }
-  else if(req.query.uris) {
-    var playlist_url = ''
-    var name = ''
-    axios.get('https://api.spotify.com/v1/me', {
-      headers: {
-        'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN
-      }
-    }).then(response => {
-      debug('user data aquired, creating playlist now')
-      const user_id = response.data.id
-      name = req.query.playlist_name ? req.query.playlist_name : 'recs-controller-export'
-      return axios.post("https://api.spotify.com/v1/users/"+user_id+"/playlists", JSON.stringify({name: name}), {
-        headers: {
-          'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN,
-          'Content-Type': 'application/json',
-        },
-      })
-    }).then(response => {
-      debug('playlist created, adding tracks now')
-      const playlist_id = response.data.id
-      playlist_url = response.data.external_urls.spotify
-      return axios.post('https://api.spotify.com/v1/playlists/'+playlist_id+'/tracks', JSON.stringify({uris:req.query.uris}), {
-        headers: {
-          'Authorization': 'Bearer '+ process.env.USER_ACCESS_TOKEN,
-          'Content-Type': 'application/json',
-        },
-      })
-    }).then(response => {
-      debug('tracks added, playlist success')
-      res.json({playlist_url: playlist_url, playlist_name: name })
-    }).catch(next)
-  } else {
-    res.status(400).send('No tracks found to add to playlist.')
   }
 })
 
@@ -268,7 +119,7 @@ function get_track_features(ids) {
     baseURL: 'https://api.spotify.com/v1/',
     params: { ids: ids },
     headers: {
-      'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
+      'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
     },
   })
 }
@@ -278,7 +129,7 @@ function get_artists(ids) {
     baseURL: 'https://api.spotify.com/v1/',
     params: { ids: ids },
     headers: {
-      'Authorization': 'Bearer '+ (process.env.USER_ACCESS_TOKEN ? process.env.USER_ACCESS_TOKEN : process.env.ACCESS_TOKEN)
+      'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
     },
   })
 }
