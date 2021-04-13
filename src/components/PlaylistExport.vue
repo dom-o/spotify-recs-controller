@@ -15,7 +15,7 @@
   </SlotDisplay>
   <SlotDisplay v-else-if="logged_in">
     <button style="float:right;" @click="logOut">log out of Spotify</button>
-    <form @submit.prevent="processForm">
+    <form @submit.prevent="processFormWrapper">
       <label>Name your playlist:
       <input v-model="playlist_name" required type="text"></label>
       <input style="display:block; margin-top:1rem;" type="submit" value="create playlist">
@@ -102,6 +102,12 @@ export default {
       this.logged_in = false
       this.$store.commit('clearAccessToken')
     },
+    processFormWrapper: function() {
+      this.playlist_message = '..loading'
+      setTimeout(() => {
+        this.processForm()
+      }, 20)
+    },
     processForm: function () {
       this.playlist_success = false
       const uris = this.song_recs.map(song => song.uri)
@@ -132,7 +138,7 @@ export default {
         this.created_playlist = name
       }).catch(error => {
         console.log(error)
-        if(error.response.status === 401) {
+        if(error.response && error.response.status === 401) {
           this.logged_in = false
           this.login_message = "Your login expired. Try logging in again."
         } else {
