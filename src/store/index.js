@@ -209,6 +209,11 @@ export default new Vuex.Store({
       state.login_error = error
     },
     retrieveState() {},
+    resetSearchState(state) {
+      const save = state.access_token
+      Object.assign(state, getDefaultState())
+      state.access_token = save
+    },
     resetState(state) {
       Object.assign(state, getDefaultState())
     }

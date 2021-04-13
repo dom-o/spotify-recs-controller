@@ -53,6 +53,15 @@ const plugin = store => {
       retrieveStorage('saved_query', 'updateSavedQuery', store)
       retrieveStorage('callback_state', 'setCallbackState', store)
       retrieveStorage('access_token', 'setAccessToken', store)
+    } else if (mutation.type === 'resetSearchState') {
+      var save
+      try { save = localStorage.getItem('access_token') }
+      catch(error) { console.log(error) }
+
+      localStorage.clear()
+
+      try { localStorage.setItem('access_token', save) }
+      catch(error) { console.log(error) }
     } else if (mutation.type === 'resetState') {
       localStorage.clear()
     }

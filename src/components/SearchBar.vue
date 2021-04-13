@@ -71,7 +71,7 @@ export default {
   },
   created() {
     if(this.$route.query && this.$route.query.new === 'true') {
-      this.$store.commit('resetState')
+      this.$store.commit('resetSearchState')
     } else {
       this.$store.commit('retrieveState')
     }

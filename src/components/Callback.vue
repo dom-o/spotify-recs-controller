@@ -43,5 +43,4 @@ export default {
     this.$router.push({ path: 'export' })
   }
 }
-
 </script>
