@@ -6,33 +6,36 @@
 </nav>
 <h1>Save to playlist</h1>
 <div v-if="song_recs.length>0&&seed_count>0">
-  <template v-if="!logged_in">
-    <template v-if="login_error">
-      <p>
-        There was an error while logging in. Wait a bit and then try to log in again.
-      </p>
-      <p>
-        {{ login_error }}
-      </p>
-    </template>
-    <a :href="getLoginLink()">Log in</a> to Spotify.
-  </template>
+  <p v-if="loading">..loading</p>
   <template v-else>
-    <button style="float:right;" @click="logOut">log out of Spotify</button>
-    <form @submit.prevent="processForm">
-      <label>Name your playlist:
-      <input v-model="playlist_name" required type="text"></label>
-      <input style="display:block; margin-top:1rem;" type="submit" value="create playlist">
-    </form>
+    <template v-if="!logged_in">
+      <template v-if="login_error">
+        <p>
+          There was an error while logging in. Wait a bit and then try to log in again.
+        </p>
+        <p>
+          {{ login_error }}
+        </p>
+      </template>
+      <a :href="getLoginLink()">Log in</a> to Spotify.
+    </template>
+    <template v-else>
+      <button style="float:right;" @click="logOut">log out of Spotify</button>
+      <form @submit.prevent="processForm">
+        <label>Name your playlist:
+        <input v-model="playlist_name" required type="text"></label>
+        <input style="display:block; margin-top:1rem;" type="submit" value="create playlist">
+      </form>
 
-    <p v-if="playlist_success">Playlist "{{this.created_playlist}}" was created. <a :href="this.playlist_url">Listen</a> to it!</p>
-    <template v-else-if="playlist_failure">
-      <p>
-        There was a server error. Check your Spotify account, and see if the playlist is there and in what state; sometimes it gets created but adding the songs fails. If you want to try again, wait a bit and then click 'create playlist' again.
-      </p>
-      <p>
-        {{ playlist_failure }}
-      </p>
+      <p v-if="playlist_success">Playlist "{{this.created_playlist}}" was created. <a :href="this.playlist_url">Listen</a> to it!</p>
+      <template v-else-if="playlist_failure">
+        <p>
+          There was a server error. Check your Spotify account, and see if the playlist is there and in what state; sometimes it gets created but adding the songs fails. If you want to try again, wait a bit and then click 'create playlist' again.
+        </p>
+        <p>
+          {{ playlist_failure }}
+        </p>
+      </template>
     </template>
   </template>
 </div>
@@ -96,12 +99,15 @@ export default {
           }
         }).then( () => {
           this.logged_in = true
+          this.loading = false
         }).catch(error => {
-          console.log(error)
+          console.log('Login check; server returned:', error)
           this.logged_in = false
+          this.loading = false
         })
       } else {
         this.logged_in = false
+        this.loading = false
       }
     },
     logOut: function() {
@@ -153,6 +159,7 @@ export default {
     return {
       base_url: 'https://api.spotify.com/v1',
       logged_in: false,
+      loading: true,
       playlist_name: "",
       created_playlist: "",
       playlist_url: "",
