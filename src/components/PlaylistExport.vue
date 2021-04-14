@@ -6,14 +6,15 @@
 </nav>
 <h1>Save to playlist</h1>
 <div>
-  <SlotDisplay v-if="song_recs.length===0 || seed_count===0">
+<SlotDisplay>
+  <template v-if="song_recs.length===0 || seed_count===0">
     <p>There's no songs to add to this playlist. <router-link to="/search">Add some first</router-link>.</p>
-  </SlotDisplay>
-  <SlotDisplay v-else-if="!logged_in">
+  </template>
+  <template v-else-if="logged_in<0">
     <p> {{ login_message }} </p>
     <template :v-slot="aux"><a :href="getLoginLink()">Log in</a> to Spotify.</template>
-  </SlotDisplay>
-  <SlotDisplay v-else-if="logged_in">
+  </template>
+  <template v-else-if="logged_in>0">
     <button style="float:right;" @click="logOut">log out of Spotify</button>
     <form @submit.prevent="processFormWrapper">
       <label>Name your playlist:
@@ -22,7 +23,8 @@
     </form>
     <template v-if="playlist_success" :v-slot="aux"><p>Playlist "{{this.created_playlist}}" was created. <a :href="this.playlist_url">Listen</a> to it!</p></template>
     <template v-else :v-slot="aux"><p> {{ playlist_message }} </p></template>
-  </SlotDisplay>
+  </template>
+</SlotDisplay>
 </div>
 </div>
 </template>
@@ -86,20 +88,20 @@ export default {
             'Authorization': 'Bearer '+ this.access_token
           }
         }).then( () => {
-          this.logged_in = true
+          this.logged_in = 1
         }).catch(error => {
           console.log('Login check; server returned:', error)
-          this.logged_in = false
+          this.logged_in = -1
           this.login_message = ''
         })
       } else {
-        this.logged_in = false
+        this.logged_in = -1
         this.login_message = this.login_error ? this.login_error : ''
         this.$store.commit('setLoginError', null)
       }
     },
     logOut: function() {
-      this.logged_in = false
+      this.logged_in = -1
       this.$store.commit('clearAccessToken')
     },
     processFormWrapper: function() {
@@ -139,7 +141,7 @@ export default {
       }).catch(error => {
         console.log(error)
         if(error.response && error.response.status === 401) {
-          this.logged_in = false
+          this.logged_in = -1
           this.login_message = "Your login expired. Try logging in again."
         } else {
           this.playlist_message = "There was an error creating your playlist. If you want to try again, wait a bit and then click 'create playlist' again, and if that doesn't work, click 'log out of spotify' and log back in."
@@ -156,7 +158,7 @@ export default {
       login_message: "",
       playlist_message: "",
       playlist_success: false,
-      logged_in: false,
+      logged_in: 0,
       playlist_name: "",
       created_playlist: "",
       playlist_url: "",
