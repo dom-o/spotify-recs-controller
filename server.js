@@ -13,6 +13,17 @@ const app = express()
 const port = 3000
 const payload = process.env.VUE_APP_SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET
 const encodedPayload = new Buffer(payload).toString('base64')
+var access_token = "xxx"
+
+axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
+  headers: {
+    'Authorization': 'Basic '+ encodedPayload,
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+}).then(response => {
+  access_token = response.data.access_token
+}).catch(error => { debug(error) })
+
 
 app.use(express.json())
    .use(helmet())
@@ -34,8 +45,8 @@ axios.interceptors.response.use(null, (error) =>{
         'Content-Type': 'application/x-www-form-urlencoded',
       },
     })).then(response => {
-      process.env.ACCESS_TOKEN = response.data.access_token
-      error.config.headers['Authorization'] = 'Bearer '+ process.env.ACCESS_TOKEN
+      access_token = response.data.access_token
+      error.config.headers['Authorization'] = 'Bearer '+ access_token
       return axios.request(error.config)
     })
   }
@@ -53,7 +64,7 @@ app.get('/search', function(req, res, next) {
         limit: 6,
       },
       headers: {
-        'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
+        'Authorization': 'Bearer '+ access_token
       },
     }).then(response => { res.json(response.data) })
     .catch(next)
@@ -67,7 +78,7 @@ app.get('/genres', function(req, res, next) {
   axios.get('/recommendations/available-genre-seeds', {
     baseURL: 'https://api.spotify.com/v1/',
     headers: {
-      'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
+      'Authorization': 'Bearer '+ access_token
     },
   }).then(response => { res.json(response.data) })
   .catch(next)
@@ -103,7 +114,7 @@ app.get('/rec', function(req, res, next) {
       baseURL: 'https://api.spotify.com/v1/',
       params: req.query,
       headers: {
-        'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
+        'Authorization': 'Bearer '+ access_token
       },
     }).then(response => { res.json(response.data) })
     .catch(next)
@@ -119,7 +130,7 @@ function get_track_features(ids) {
     baseURL: 'https://api.spotify.com/v1/',
     params: { ids: ids },
     headers: {
-      'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
+      'Authorization': 'Bearer '+ access_token
     },
   })
 }
@@ -129,7 +140,7 @@ function get_artists(ids) {
     baseURL: 'https://api.spotify.com/v1/',
     params: { ids: ids },
     headers: {
-      'Authorization': 'Bearer '+ process.env.ACCESS_TOKEN
+      'Authorization': 'Bearer '+ access_token
     },
   })
 }
