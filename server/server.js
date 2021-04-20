@@ -11,7 +11,7 @@ const cors = require('cors')
 const app = express()
 const port = 3000
 const payload = process.env.VUE_APP_SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET
-const encodedPayload = new Buffer(payload).toString('base64')
+const encodedPayload = Buffer.from(payload).toString('base64')
 var access_token = "xxx"
 
 axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
