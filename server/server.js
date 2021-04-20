@@ -1,5 +1,5 @@
 require('dotenv').config({
-  path: '.env.local'
+  path: '../.env.server.local'
 })
 const debug = require('debug')('express:server')
 const express = require('express')
