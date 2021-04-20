@@ -7,7 +7,6 @@ const helmet = require('helmet')
 const axios = require('axios')
 const axiosRetry = require('axios-retry')
 const cors = require('cors')
-// const cookieParser = require('cookie-parser')
 // const { body } = require('express-validator')
 const app = express()
 const port = 3000
