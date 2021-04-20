@@ -7,7 +7,7 @@ const helmet = require('helmet')
 const axios = require('axios')
 const axiosRetry = require('axios-retry')
 const cors = require('cors')
-const cookieParser = require('cookie-parser')
+// const cookieParser = require('cookie-parser')
 // const { body } = require('express-validator')
 const app = express()
 const port = 3000
@@ -27,7 +27,7 @@ axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credenti
 
 app.use(express.json())
    .use(helmet())
-   .use(cookieParser())
+   // .use(cookieParser())
    .use(cors({
      origin: process.env.VUE_APP_CLIENT_URL,
      credentials: true,

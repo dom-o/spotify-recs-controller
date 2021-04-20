@@ -11,13 +11,7 @@
   "dependencies": {
     "axios": "^0.21.1",
     "axios-retry": "^3.1.8",
-    "cookie-parser": "^1.4.5",
-    "cors": "^2.8.5",
-    "debug": "^4.3.1",
-    "dotenv": "^8.2.0",
     "es6-promise": "^4.2.8",
-    "express-validator": "^6.10.0",
-    "helmet": "^4.4.1",
     "vue": "^2.6.11",
     "vue-router": "^3.1.6",
     "vuex": "^3.4.0"
