@@ -62,6 +62,7 @@ export default {
         this.genres = response.data.genres
       })
       .catch(error => {
+        console.log(error.response)
         this.server_error = error
         console.log(error)
       })

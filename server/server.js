@@ -73,6 +73,7 @@ app.get('/search', function(req, res, next) {
 })
 
 app.get('/genres', function(req, res, next) {
+  console.log('genres')
   debug('/genres')
   axios.get('/recommendations/available-genre-seeds', {
     baseURL: 'https://api.spotify.com/v1/',
