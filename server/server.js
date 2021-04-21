@@ -1,5 +1,6 @@
+const path = require ('path')
 require('dotenv').config({
-  path: '../.env.server.local'
+  path: path.resolve(__dirname, '../.env.server.local')
 })
 const debug = require('debug')('express:server')
 const express = require('express')
@@ -14,16 +15,6 @@ const payload = process.env.VUE_APP_SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CL
 const encodedPayload = Buffer.from(payload).toString('base64')
 var access_token = "xxx"
 
-axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
-  headers: {
-    'Authorization': 'Basic '+ encodedPayload,
-    'Content-Type': 'application/x-www-form-urlencoded',
-  },
-}).then(response => {
-  access_token = response.data.access_token
-}).catch(error => { debug(error) })
-
-
 app.use(express.json())
    .use(helmet())
    // .use(cookieParser())
@@ -34,6 +25,15 @@ app.use(express.json())
    }))
 
 axiosRetry(axios, { retryDelay: axiosRetry.exponentialDelay })
+
+axios.post('https://accounts.spotify.com/api/token', 'grant_type=client_credentials', {
+  headers: {
+    'Authorization': 'Basic '+ encodedPayload,
+    'Content-Type': 'application/x-www-form-urlencoded',
+  },
+}).then(response => {
+  access_token = response.data.access_token
+}).catch(error => { debug(error) })
 
 axios.interceptors.response.use(null, (error) =>{
   if(error.config && error.response && error.response.status === 401) {
@@ -73,7 +73,6 @@ app.get('/search', function(req, res, next) {
 })
 
 app.get('/genres', function(req, res, next) {
-  console.log('genres')
   debug('/genres')
   axios.get('/recommendations/available-genre-seeds', {
     baseURL: 'https://api.spotify.com/v1/',
