@@ -11,7 +11,7 @@ const cors = require('cors')
 // const { body } = require('express-validator')
 const app = express()
 const port = 3000
-const payload = process.env.VUE_APP_SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET
+const payload = process.env.SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET
 const encodedPayload = Buffer.from(payload).toString('base64')
 var access_token = "xxx"
 
@@ -19,7 +19,7 @@ app.use(express.json())
    .use(helmet())
    // .use(cookieParser())
    .use(cors({
-     origin: process.env.VUE_APP_CLIENT_URL,
+     origin: process.env.CLIENT_URL,
      credentials: true,
      optionsSuccessStatus: 200,
    }))
