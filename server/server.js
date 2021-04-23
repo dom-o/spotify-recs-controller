@@ -8,7 +8,6 @@ const helmet = require('helmet')
 const axios = require('axios')
 const axiosRetry = require('axios-retry')
 const cors = require('cors')
-// const { body } = require('express-validator')
 const app = express()
 const port = 3000
 const payload = process.env.SPOTIFY_CLIENT_ID+':'+process.env.SPOTIFY_CLIENT_SECRET
