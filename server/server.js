@@ -16,7 +16,6 @@ var access_token = "xxx"
 
 app.use(express.json())
    .use(helmet())
-   // .use(cookieParser())
    .use(cors({
      origin: process.env.CLIENT_URL,
      credentials: true,
@@ -57,7 +56,7 @@ app.get('/search', function(req, res, next) {
     axios.get('/search', {
       baseURL: 'https://api.spotify.com/v1/',
       params: {
-        q: req.query.query,
+        q: req.query.query+'',
         type: 'track,artist',
         limit: 6,
       },
@@ -87,7 +86,6 @@ app.get('/info', function(req, res, next) {
   const methods = req.query.tracks
     ? [get_track_features(req.query.tracks.toString())]
     : []
-
   axios.all(methods)
   .then((results) => {
     const converted =
@@ -107,7 +105,6 @@ app.get('/rec', function(req, res, next) {
     for(let key in req.query) {
       req.query[key] = req.query[key].toString()
     }
-
     axios.get('/recommendations', {
       baseURL: 'https://api.spotify.com/v1/',
       params: req.query,
@@ -125,16 +122,6 @@ app.listen(port, () => debug(`Listening on port ${port}!`))
 
 function get_track_features(ids) {
   return axios.get('/audio-features', {
-    baseURL: 'https://api.spotify.com/v1/',
-    params: { ids: ids },
-    headers: {
-      'Authorization': 'Bearer '+ access_token
-    },
-  })
-}
-
-function get_artists(ids) {
-  return axios.get('/artists', {
     baseURL: 'https://api.spotify.com/v1/',
     params: { ids: ids },
     headers: {
