@@ -1,6 +1,5 @@
 <template>
   <div>
-  <header>Back to <a href="https://domonicmilesi.com/">domonicmilesi.com</a></header>
   <div id="app">
 
     <router-view></router-view>
